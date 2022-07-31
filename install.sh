@@ -86,7 +86,7 @@ sudo -v
 
 printf "\n🗄  Creating directories\n"
 create_dirs
-sudo chown -R $(whoami) /usr/local
+sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/include /usr/local/share
 
 printf "\n🐳  Installing Docker\n"
 install_docker
