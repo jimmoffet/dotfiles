@@ -25,9 +25,9 @@ do this in curl'd script?
 
 To install:
 
-`curl -L https://git.io/JeA7g | sh`
+`curl -L https://raw.githubusercontent.com/jimmoffet/dotfiles/main/run.sh | sh`
 
-This expands to [run.sh](https://github.com/gretzky/dotfiles/blob/master/run.sh) which will fetch this repo and run the install script.
+This will fetch [run.sh](https://raw.githubusercontent.com/jimmoffet/dotfiles/main/run.sh) which will fetch this repo and run the install script.
 
 ## File overview
 
