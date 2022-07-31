@@ -33,3 +33,6 @@ source $HOME/dotfiles/zsh/.aliases
 # start tmux on open
 [[ $- != *i* ]] && return
 [[ -z "$TMUX" ]] && exec tmux
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/terraform terraform

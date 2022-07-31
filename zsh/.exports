@@ -18,8 +18,8 @@ export GPG_TTY=$(tty)
 PATH=$PATH:/opt/homebrew/bin
 
 # configure ruby
-source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+source /usr/local/share/chruby/chruby.sh
+source /usr/local/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
@@ -43,17 +43,17 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --smart-case --glob "!.
 export PATH=$PATH:$HOME/depot_tools
 
 # android
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$ANDROID_HOME/emulator:$PATH
-export PATH=$ANDROID_HOME/tools:$PATH
-export PATH=$ANDROID_HOME/tools/bin:$PATH
-export PATH=$ANDROID_HOME/platform-tools:$PATH
+# export ANDROID_HOME=$HOME/Library/Android/sdk
+# export PATH=$ANDROID_HOME/emulator:$PATH
+# export PATH=$ANDROID_HOME/tools:$PATH
+# export PATH=$ANDROID_HOME/tools/bin:$PATH
+# export PATH=$ANDROID_HOME/platform-tools:$PATH
 
 # ripgrep
 export RIPGREP_CONFIG_PATH=$HOME/.rgrc
 
 # conda
-export PATH="/usr/local/miniconda3/bin:$PATH"
+# export PATH="/usr/local/miniconda3/bin:$PATH"
 
 # linux utils
 export PATH="/usr/local/opt/util-linux/bin:$PATH"

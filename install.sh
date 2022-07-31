@@ -11,7 +11,13 @@ install_brew() {
     printf "Found homebrew..."
     sudo softwareupdate --install-rosetta
     printf "Installing homebrew packages..."
+    rm /usr/local/bin/pod
+    export LDFLAGS="-L/usr/local/opt/libxml2/lib"
+    export CPPFLAGS="-I/usr/local/opt/libxml2/include"
+    export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
+    rm /usr/local/bin/2to3
     brew bundle
+    brew link --overwrite cocoapods
 }
 
 create_dirs() {
@@ -43,6 +49,15 @@ build_xcode() {
     fi
     if xcode-select --print-path &> /dev/null; then
         printf "XCODE HAS BEEN FOUND..."
+        # xcode-select --install &> /dev/null
+
+        # until xcode-select --print-path &> /dev/null; do
+        #     sleep 5
+        # done
+
+        # sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
+        # sudo xcodebuild -license
     fi
 }
 
@@ -69,65 +84,75 @@ install_docker() {
 # Ask for the administrator password upfront
 sudo -v
 
-printf "🗄  Creating directories\n"
+printf "\n🗄  Creating directories\n"
 create_dirs
+sudo chown -R $(whoami) /usr/local
 
-printf "🐳  Installing Docker\n"
+printf "\n🐳  Installing Docker\n"
 install_docker
 
-printf "🛠  Installing Xcode Command Line Tools\n"
+printf "\n🛠  Installing Xcode Command Line Tools\n"
 build_xcode
 
 # -v should extend sudo for 5 minutes
 sudo -v
 
-printf "🍺  Installing Homebrew packages\n"
+printf "\n🍺  Installing Homebrew packages\n"
 install_brew
 
-# printf "🛍️  Installing Mac App Store apps\n"
+sudo -v
+
+# printf "\n🛍️  Installing Mac App Store apps\n"
 # install_app_store_apps
 
-printf "💻  Set macOS preferences\n"
+printf "\n💻  Set macOS preferences\n"
 ./macos/.macos
 
-# printf "🌈  Configure Ruby\n"
+sudo -v
+
+printf "\n🌈  Configure Ruby\n"
 # ruby-install ruby-2.7.4 1>/dev/null
-# source /opt/homebrew/opt/chruby/share/chruby.sh
-# source /opt/homebrew/opt/chruby/share/auto.sh
-# chruby ruby-2.7.4 1>/dev/null
-# # disable downloading documentation
-# echo "gem: --no-document" >> ~/.gemrc
-# gem update --system 1>/dev/null
-# gem install bundler 1>/dev/null
-# # configure bundler to take advantage of cores
-# num_cores=$(sysctl -n hw.cpu)
-# bundle config set --global jobs $((num_cores - 1)) 1>/dev/null
-# # install colorls
-# gem install clocale colorls 1>/dev/null
+sudo -v
+sudo chown -R $(whoami) /usr/local/share
+source /usr/local/share/chruby/chruby.sh
+source /usr/local/share/chruby/auto.sh
+chruby ruby-2.7.4
+# disable downloading documentation
+echo "gem: --no-document" >> ~/.gemrc
+gem update --system
+gem install bundler
+# configure bundler to take advantage of cores
+num_cores=$(sysctl -n hw.ncpu)
+bundle config set --global jobs $((num_cores - 1))
+# install colorls
+gem install clocale colorls
 
-# printf "📦  Configure Node\n"
-# # install n for version management
-# yarn global add n 1>/dev/null
-# # make cache folder (if missing) and take ownership
-# sudo mkdir -p /usr/local/n
-# sudo chown -R $(whoami) /usr/local/n
-# # take ownership of Node.js install destination folders
-# sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/include /usr/local/share
-# # install and use node lts
-# n lts
+printf "\n📦  Configure Node\n"
+# install n for version management
+yarn global add n 1>/dev/null
+# make cache folder (if missing) and take ownership
+sudo mkdir -p /usr/local/n
+sudo chown -R $(whoami) /usr/local/n
+# take ownership of Node.js install destination folders
+sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/include /usr/local/share
+# install and use node lts
+n lts
 
-# printf "🐍  Configure Python\n"
-# # setup pyenv / global python to 3.10.x
-# pyenv install 3.10 1>/dev/null
-# pyenv global 3.10 1>/dev/null
+printf "\n🐍  Configure Python\n"
+# setup pyenv
+pyenv install 3.10.1 -f 1>/dev/null
+pyenv global 3.10.1 1>/dev/null
 # # dont set conda clutter in zshrc
 # conda config --set auto_activate_base false
 
-printf "👽  Installing vim-plug\n"
+printf "\n👽  Installing vim-plug\n"
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     	https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-printf "🐗  Stow dotfiles\n"
+# printf "\n🐗  Stow dotfiles\n"
+rm ~/.zshrc
+rm ~/.gitconfig
 stow alacritty colorls fzf git nvim yabai skhd starship tmux vim z zsh
+chsh -s /bin/zsh
 
-printf "✨  Done!\n"
+printf "\n\n✨  Done!\n"
