@@ -19,9 +19,7 @@ Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 
 On a sparkling fresh installation of macOS:
 
-do this in curl'd script?
-`sudo softwareupdate -i -a`
-`xcode-select --install`
+Install xcode from Mac App Store, then install dotfiles.
 
 To install:
 
@@ -41,7 +39,6 @@ This will fetch [run.sh](https://raw.githubusercontent.com/jimmoffet/dotfiles/ma
   - [starship](./starship)
   - [tmux](./tmux)
   - [VSCode](./vscode)
-  - [yabai](./yabai)
   - [z](./z)
 - Shell environment configs:
   - [Antigen](https://github.com/zsh-users/antigen) for zsh plugin management
