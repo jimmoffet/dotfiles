@@ -8,6 +8,8 @@ export EDITOR=nvim
 HISTSIZE=50000
 SAVEHIST=10000
 
+
+
 source ~/antigen.zsh
 
 antigen bundles <<EOBUNDLES
@@ -29,6 +31,8 @@ eval "$(starship init zsh)"
 # load the rest of the configs
 source $HOME/dotfiles/zsh/.exports
 source $HOME/dotfiles/zsh/.aliases
+
+chruby ruby-2.7.4
 
 # start tmux on open
 [[ $- != *i* ]] && return
