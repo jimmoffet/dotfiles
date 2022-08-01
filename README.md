@@ -15,11 +15,11 @@ Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 
 ## Installation
 
-**Before you get started** make sure you give full disk access permission to your terminal (for writing macos defaults). `System Preferences -> Privacy -> Full Disk Access`.
+**Before you get started** On a sparkling fresh installation of macOS:
 
-On a sparkling fresh installation of macOS:
+Give full disk access permission to your terminal (for writing macos defaults). `System Preferences -> Privacy -> Full Disk Access`.
 
-Install xcode from Mac App Store, then install dotfiles.
+Install xcode from the [Apple Developer website](https://developer.apple.com/download/applications/), then install dotfiles.
 
 To install:
 

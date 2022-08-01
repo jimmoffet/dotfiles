@@ -29,6 +29,7 @@ alias gpl="git pull"
 
 # adding
 alias gaa="git add ."
+alias gcm="git commit -m"
 alias gap="git add --patch"
 alias gau="git add --update"
 
