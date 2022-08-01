@@ -69,10 +69,11 @@ install_docker() {
         printf "DOCKER NOT FOUND..."
         if [[ $(uname -m) == 'arm64' ]]; then
           curl -LO https://desktop.docker.com/mac/main/arm64/Docker.dmg
-    fi
+        fi
         if [[ $(uname -m) == 'x86_64' ]]; then
           curl -LO https://desktop.docker.com/mac/main/amd64/Docker.dmg
-    fi
+        fi
+        sudo -v
         sudo hdiutil attach Docker.dmg
         sudo /Volumes/Docker/Docker.app/Contents/MacOS/install
         sudo hdiutil detach /Volumes/Docker
@@ -89,6 +90,43 @@ install_docker() {
 #     mas install 1195076754 # Pikka
 # }
 
+configure_ruby() {
+    ruby-install ruby-2.7.4 1>/dev/null
+    sudo -v
+    source /usr/local/share/chruby/chruby.sh
+    source /usr/local/share/chruby/auto.sh
+    chruby ruby-2.7.4
+    # disable downloading documentation
+    echo "gem: --no-document" >> ~/.gemrc
+    gem update --system
+    gem install bundler
+    # configure bundler to take advantage of cores
+    num_cores=$(sysctl -n hw.ncpu)
+    bundle config set --global jobs $((num_cores - 1))
+    # install colorls
+    gem install clocale colorls
+}
+
+configure_node() {
+    # install n for version management
+    yarn global add n 1>/dev/null
+    # make cache folder (if missing) and take ownership
+    sudo mkdir -p /usr/local/n
+    sudo chown -R $(whoami) /usr/local/n
+    # take ownership of Node.js install destination folders
+    sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/include /usr/local/share
+    # install and use node lts
+    n lts
+}
+
+configure_python() {
+    # setup pyenv
+    pyenv install 3.10.1 -f 1>/dev/null
+    pyenv global 3.10.1 1>/dev/null
+    # # dont set conda clutter in zshrc
+    # conda config --set auto_activate_base false
+}
+
 # Ask for the administrator password upfront
 sudo -v
 
@@ -98,8 +136,6 @@ sudo chown -R $(whoami) /usr/local /usr/local/bin /usr/local/lib /usr/local/incl
 
 printf "\n🐳  Installing Docker\n"
 install_docker
-
-# -v should extend sudo for 5 minutes
 sudo -v
 
 printf "\n🛠  Installing Xcode Command Line Tools\n"
@@ -118,47 +154,22 @@ printf "\n💻  Set macOS preferences\n"
 sudo -v
 
 printf "\n🌈  Configure Ruby\n"
-ruby-install ruby-2.7.4 1>/dev/null
-sudo -v
-source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh
-chruby ruby-2.7.4
-# disable downloading documentation
-echo "gem: --no-document" >> ~/.gemrc
-gem update --system
-gem install bundler
-# configure bundler to take advantage of cores
-num_cores=$(sysctl -n hw.ncpu)
-bundle config set --global jobs $((num_cores - 1))
-# install colorls
-gem install clocale colorls
+configure_ruby
 sudo -v
 
 printf "\n📦  Configure Node\n"
-# install n for version management
-yarn global add n 1>/dev/null
-# make cache folder (if missing) and take ownership
-sudo mkdir -p /usr/local/n
-sudo chown -R $(whoami) /usr/local/n
-# take ownership of Node.js install destination folders
-sudo chown -R $(whoami) /usr/local/bin /usr/local/lib /usr/local/include /usr/local/share
-# install and use node lts
-n lts
+configure_node
 sudo -v
 
 printf "\n🐍  Configure Python\n"
-# setup pyenv
-pyenv install 3.10.1 -f 1>/dev/null
-pyenv global 3.10.1 1>/dev/null
-# # dont set conda clutter in zshrc
-# conda config --set auto_activate_base false
+configure_python
 sudo -v
 
 printf "\n👽  Installing vim-plug\n"
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-# printf "\n🐗  Stow dotfiles\n"
+printf "\n🐗  Stow dotfiles\n"
 rm ~/.zshrc
 rm ~/.gitconfig
 stow alacritty colorls fzf git nvim yabai skhd starship tmux vim z zsh
