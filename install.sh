@@ -17,7 +17,6 @@ install_brew() {
 #    export CPPFLAGS="-I/usr/local/opt/libxml2/include"
 #    export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
     export LDFLAGS="" && export CPPFLAGS="" && export PKG_CONFIG_PATH=""
-
     rm /usr/local/bin/2to3
     brew bundle
     brew link --overwrite cocoapods
@@ -29,7 +28,6 @@ create_dirs() {
         "$HOME/Desktop/screenshots"
         "$HOME/dev"
     )
-
     for i in "${dirs[@]}"; do
         sudo mkdir "$i"
     done
@@ -37,30 +35,16 @@ create_dirs() {
 
 build_xcode() {
     if ! xcode-select --print-path &> /dev/null; then
-        
         printf "XCODE NOT FOUND..."
-
         xcode-select --install &> /dev/null
-
         until xcode-select --print-path &> /dev/null; do
             sleep 5
         done
-
         sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
-
         sudo xcodebuild -license
     fi
     if xcode-select --print-path &> /dev/null; then
         printf "XCODE HAS BEEN FOUND..."
-        # xcode-select --install &> /dev/null
-
-        # until xcode-select --print-path &> /dev/null; do
-        #     sleep 5
-        # done
-
-        # sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
-
-        # sudo xcodebuild -license
     fi
 }
 
