@@ -39,5 +39,13 @@
     "workbench.statusBar.visible": true,
     "zenMode.centerLayout": false,
     "zenMode.fullScreen": false,
-    "zenMode.restore": true
+    "zenMode.restore": true,
+    "search.mode": "newEditor",
+    "workbench.colorCustomizations": {
+        "editorWarning.foreground": "#ffff00", // Warnings inside the file
+        "editorError.foreground": "#f66", // Errors inside the file
+        "list.warningForeground": "#e45bff", // Warnings on the file name
+        "list.errorForeground": "#f66", // Errors on the file name
+    },
+    "git.decorations.enabled": true,
 }
