@@ -3,7 +3,6 @@
 create_dirs() {
     printf "\n🗄  Creating directories\n"
     declare -a dirs=(
-        # "$HOME/Downloads/torrents"
         "$HOME/Desktop/screenshots"
         "$HOME/dev"
     )
@@ -43,10 +42,6 @@ install_brew() {
     sudo softwareupdate --install-rosetta --agree-to-license
     sudo -v
     printf "Installing homebrew packages..."
-    
-#    export LDFLAGS="-L/usr/local/opt/libxml2/lib"
-#    export CPPFLAGS="-I/usr/local/opt/libxml2/include"
-#    export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
     export LDFLAGS="" && export CPPFLAGS="" && export PKG_CONFIG_PATH=""
     rm /usr/local/bin/pod
     rm /usr/local/bin/2to3
@@ -147,6 +142,8 @@ configure_vim() {
     printf "\n👽  Installing vim-plug\n"
     curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    sudo chown -R "$USER":admin /Users/$USER/.local/share/
+    sudo chown -R "$USER":admin /Users/$USER/.vim/*
     sudo -v
 }
 
@@ -162,17 +159,20 @@ stow_dotfiles() {
 sudo -v
 
 ## RUN THE THINGS 
-create_dirs
-build_xcode
-install_brew
-install_app_store_apps
-mac_defaults_write
-install_docker
-configure_ruby
-configure_node
-configure_python
-configure_vim
-stow_dotfiles
+# create_dirs
+# build_xcode
+# install_brew
+# install_app_store_apps
+# mac_defaults_write
+# install_docker
+# configure_ruby
+# configure_node
+# configure_python
+# configure_vim
+# stow_dotfiles
+
+grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
 
 printf "\n\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)"
+
