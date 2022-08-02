@@ -3,8 +3,14 @@
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
+
 PATH=/usr/local/bin:/usr/local/sbin:"$PATH"
 PATH=/opt/local/bin:/opt/local/sbin:"$PATH"
+
+# brew
+PATH=/opt/homebrew/bin:"$PATH"
+PATH=/opt/homebrew/sbin:"$PATH"
+
 
 # prefer US English & utf-8
 export LC_ALL="en_US.UTF-8"
@@ -14,8 +20,7 @@ export LANG="en_US"
 # https://stackoverflow.com/a/42265848/96656
 export GPG_TTY=$(tty)
 
-# brew
-PATH=$PATH:/opt/homebrew/bin
+
 
 # configure ruby
 source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
@@ -23,6 +28,10 @@ source /opt/homebrew/opt/chruby/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
+# python
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH=$PYENV_ROOT/bin:$PATH
+eval "$(pyenv init -)"
 
 # npm global
 export NPM_PACKAGES="/usr/local/npm_packages"

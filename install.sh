@@ -184,18 +184,18 @@ set_startup_scripts() {
 sudo -v
 
 ## RUN THE THINGS 
-create_dirs
-build_xcode
-install_brew
-install_app_store_apps
-mac_defaults_write
-install_docker
-configure_ruby
-configure_node
+# create_dirs
+# build_xcode
+# install_brew
+# install_app_store_apps
+# mac_defaults_write
+# install_docker
+# configure_ruby
+# configure_node
 configure_python
-configure_vim
-stow_dotfiles
-set_up_touchid
+# configure_vim
+# stow_dotfiles
+# set_up_touchid
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
