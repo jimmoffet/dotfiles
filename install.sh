@@ -5,6 +5,7 @@ create_dirs() {
     declare -a dirs=(
         "$HOME/Desktop/screenshots"
         "$HOME/dev"
+        "/usr/local/bin"
     )
     for i in "${dirs[@]}"; do
         sudo mkdir "$i"
@@ -155,24 +156,46 @@ stow_dotfiles() {
     sudo -v
 }
 
+set_up_touchid() {
+    printf "\n☝️  Set up Touch ID\n"
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo"; 
+        then
+            printf "\nTouch ID is set up for sudo!\n"
+        else
+            printf "\nTouch ID is not set up for sudo, setting it up now...\n"
+            grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
+    fi
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo"; 
+        then
+            printf "\nTouch ID set up succeeded!\n"
+        else
+            printf "\nTouch ID set up failed!\n"
+    fi
+}
+
+set_startup_scripts() {
+    printf "\n🎬 Set up startup scripts\n"
+    sudo chmod a+x ./startup/setuptouchid.sh
+    sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
+    # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+}
+
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
 ## RUN THE THINGS 
-# create_dirs
-# build_xcode
-# install_brew
-# install_app_store_apps
-# mac_defaults_write
-# install_docker
-# configure_ruby
-# configure_node
-# configure_python
-# configure_vim
-# stow_dotfiles
+create_dirs
+build_xcode
+install_brew
+install_app_store_apps
+mac_defaults_write
+install_docker
+configure_ruby
+configure_node
+configure_python
+configure_vim
+stow_dotfiles
+set_up_touchid
 
-grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
-
-printf "\n\n✨  Done!\n"
-printf "(don't forget to launch docker desktop for the first time)"
-
+printf "\n✨  Done!\n"
+printf "(don't forget to launch docker desktop for the first time)\n"
