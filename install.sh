@@ -149,14 +149,14 @@ stow_dotfiles() {
 
 set_up_touchid() {
     printf "\n☝️  Set up Touch ID\n"
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo"; 
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
         then
             printf "\nTouch ID is set up for sudo!\n"
         else
             printf "\nTouch ID is not set up for sudo, setting it up now...\n"
             grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
     fi
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo"; 
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
         then
             printf "\nTouch ID set up succeeded!\n"
         else
@@ -170,61 +170,67 @@ set_startup_scripts() {
     sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
     # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
 }
-
 set_up_vscode() {
-     printf "\n✏️  Set up VScode\n"
-     cp ./vscode/settings.json ./.vscode/settings.json
-     cp ./vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
-     cp ./vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
-     declare -a exts=(
-         # lint / format / syntax
-         "bungcip.better-toml"
-         "EditorConfig.EditorConfig"
-         "ms-python.python"
-         "ms-python.vscode-pylance"
-         "dbaeumer.vscode-eslint"
-         "esbenp.prettier-vscode"
-         "DavidAnson.vscode-markdownlint"
-         "mikestead.dotenv"
-         "christian-kohler.npm-intellisense"
-         "sibiraj-s.vscode-scss-formatter"
-         "ecmel.vscode-html-css"
-         "jeff-hykin.better-shellscript-syntax"
-         "bmalehorn.shell-syntax"
-         # theme & vscode UI
-         "teabyii.ayu"
-         "PKief.material-icon-theme"
-         "alexdima.copy-relative-path"
-         "devzstudio.emoji-snippets"
-         # frameworks / tooling
-         "ms-azuretools.vscode-docker"
-         "ms-vscode-remote.remote-containers"
-         "ms-vscode-remote.vscode-remote-extensionpack"
-         # Git & Github
-         "eamodio.gitlens"
-         "GitHub.copilot"
-         "donjayamanne.githistory"
-     )
-     for i in "${exts[@]}"; do
-         code --install-extension "$i"
-     done
+    printf "\n✏️  Set up VScode\n"
+    cp ./vscode/settings.json ./.vscode/settings.json
+    cp ./vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+    cp ./vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
+    declare -a exts=(
+        # lint / format / syntax
+        "bungcip.better-toml"
+        "EditorConfig.EditorConfig"
+        "ms-python.python"
+        "ms-python.vscode-pylance"
+        "dbaeumer.vscode-eslint"
+        "esbenp.prettier-vscode"
+        "DavidAnson.vscode-markdownlint"
+        "mikestead.dotenv"
+        "christian-kohler.npm-intellisense"
+        "sibiraj-s.vscode-scss-formatter"
+        "ecmel.vscode-html-css"
+        "jeff-hykin.better-shellscript-syntax"
+        "bmalehorn.shell-syntax"
+        # theme & vscode UI
+        "teabyii.ayu"
+        "PKief.material-icon-theme"
+        "alexdima.copy-relative-path"
+        "devzstudio.emoji-snippets"
+        # frameworks / tooling
+        "ms-azuretools.vscode-docker"
+        "ms-vscode-remote.remote-containers"
+        "ms-vscode-remote.vscode-remote-extensionpack"
+        # Git & Github
+        "eamodio.gitlens"
+        "GitHub.copilot"
+        "donjayamanne.githistory"
+    )
+    for i in "${exts[@]}"; do
+        code --install-extension "$i"
+    done
+
+}
+
+set_up_aws() {
+    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    sudo installer -pkg AWSCLIV2.pkg -target /
+}
 
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
-## RUN THE THINGS 
-# create_dirs
-# build_xcode
-# install_brew
-# mac_defaults_write
-# install_docker
-# configure_ruby
-# configure_node
-# configure_python
-# configure_vim
+## RUN THE THINGS
+create_dirs
+build_xcode
+install_brew
+mac_defaults_write
+install_docker
+configure_ruby
+configure_node
+configure_python
+configure_vim
 stow_dotfiles
-# set_up_touchid
 set_up_vscode
+set_up_aws
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
