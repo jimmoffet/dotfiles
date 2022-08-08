@@ -37,7 +37,7 @@ install_brew() {
         # install homebrew
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # set path
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+        eval "$(/usr/local/Homebrew/bin/brew shellenv)"
     fi
     printf "Installing rosetta before homebrew..."
     sudo softwareupdate --install-rosetta --agree-to-license
