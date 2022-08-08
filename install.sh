@@ -147,29 +147,40 @@ stow_dotfiles() {
     sudo -v
 }
 
-set_up_touchid() {
-    printf "\n☝️  Set up Touch ID\n"
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-        then
-            printf "\nTouch ID is set up for sudo!\n"
-        else
-            printf "\nTouch ID is not set up for sudo, setting it up now...\n"
-            grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
-    fi
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-        then
-            printf "\nTouch ID set up succeeded!\n"
-        else
-            printf "\nTouch ID set up failed!\n"
-    fi
-}
+# set_up_touchid() {
+#     printf "\n☝️  Set up Touch ID\n"
+#     if grep -q "pam_tid.so" "/etc/pam.d/sudo";
+#         then
+#             printf "\nTouch ID is set up for sudo!\n"
+#         else
+#             printf "\nTouch ID is not set up for sudo, setting it up now...\n"
+#             grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
+#     fi
+#     if grep -q "pam_tid.so" "/etc/pam.d/sudo";
+#         then
+#             printf "\nTouch ID set up succeeded!\n"
+#         else
+#             printf "\nTouch ID set up failed!\n"
+#     fi
+# }
 
 set_startup_scripts() {
     printf "\n🎬 Set up startup scripts\n"
-    sudo chmod a+x ./startup/setuptouchid.sh
-    sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
-    # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    sudo chmod 755 ./startup/remove-quarantine-downloads.sh
+    sudo cp ./startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
+    sudo chmod 755 ./startup/remove-quarantine-documents.sh
+    sudo cp ./startup/remove-quarantine-documents.sh $HOME/remove-quarantine-documents.sh
+    # sudo chmod 755 ./startup/remove-quarantine-applications.sh
+    # sudo cp ./startup/remove-quarantine-applications.sh $HOME/remove-quarantine-applications.sh
+
+    watchman watch ~/Downloads
+    watchman -- trigger ~/Downloads removequarantine '*' -- ~/remove-quarantine-downloads.sh
+    watchman watch ~/Documents
+    watchman -- trigger ~/Documents removequarantine '*' -- ~/remove-quarantine-documents.sh
+    # sudo watchman watch Applications
+    # sudo watchman -- trigger Applications removequarantine '*' -- ~/remove-quarantine-applications.sh
 }
+
 set_up_vscode() {
     printf "\n✏️  Set up VScode\n"
     cp ./vscode/settings.json ./.vscode/settings.json
@@ -224,7 +235,9 @@ sudo -v
 # configure_python
 # configure_vim
 # stow_dotfiles
-set_up_vscode
+# set_up_vscode
+set_startup_scripts
+
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
