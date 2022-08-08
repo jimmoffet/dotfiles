@@ -34,6 +34,13 @@ findin() {
 # git
 alias g="git"
 
+gitgo() {
+	git add .
+  git commit -m $1
+  git push
+  echo "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}"
+}
+
 # one letter aliases w/o options
 alias ga="git add"
 alias gb="git branch"
