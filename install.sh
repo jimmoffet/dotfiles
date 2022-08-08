@@ -174,6 +174,7 @@ set_up_vscode() {
     printf "\n✏️  Set up VScode\n"
     cp ./vscode/settings.json ./.vscode/settings.json
     cp ./vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+    cp ./vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
     declare -a exts=(
         # lint / format / syntax
         "bungcip.better-toml"
@@ -213,16 +214,16 @@ set_up_vscode() {
 sudo -v
 
 ## RUN THE THINGS
-create_dirs
-build_xcode
-install_brew
-mac_defaults_write
-install_docker
-configure_ruby
-configure_node
-configure_python
-configure_vim
-stow_dotfiles
+# create_dirs
+# build_xcode
+# install_brew
+# mac_defaults_write
+# install_docker
+# configure_ruby
+# configure_node
+# configure_python
+# configure_vim
+# stow_dotfiles
 set_up_vscode
 
 printf "\n✨  Done!\n"
