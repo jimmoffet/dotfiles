@@ -12,6 +12,8 @@ set softwrap
 set atblanks
 set constantshow
 
+set mouse
+
 # UX:
 set smooth
 
@@ -23,3 +25,5 @@ set historylog
 # line numbers are copied with text,
 # it is not useful:
 # set linenumbers
+
+include /usr/share/nano/*
