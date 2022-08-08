@@ -4,6 +4,7 @@
     "editor.fontFamily": "Hack Nerd Font",
     "editor.fontLigatures": true,
     "editor.formatOnSave": true,
+    "editor.inlineSuggest.enabled": true,
     "editor.minimap.enabled": false,
     "editor.tabCompletion": "on",
     "editor.suggestSelection": "first",

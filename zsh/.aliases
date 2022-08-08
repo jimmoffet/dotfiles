@@ -289,6 +289,11 @@ gi() {
 	curl -L -s https://www.gitignore.io/api/$@
 }
 
+# cloud foundry
+
+# login
+alias cflogin="cf login -a api.fr.cloud.gov --sso"
+
 # create a remote repo
 create-repo() {
 	# Get user input
@@ -396,3 +401,23 @@ pyenv() {
     ;;
   esac
 }
+
+# Loads `.env` file from a filename passed as an argument
+ loadenv () {
+   while read line; do
+     if [ "${line:0:1}" = '#' ]; then
+       continue  # comments are ignored
+     fi
+     export $line > /dev/null
+   done < "$1"
+   echo 'Loaded!'
+ }
+
+
+ # Sets up all my working env
+ workon () {
+   if _z 2>&1 "$1"; then
+     source '.venv/bin/activate' || true  # There might be no `.venv`
+     code .
+   fi
+ }

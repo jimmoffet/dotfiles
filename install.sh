@@ -51,15 +51,6 @@ install_brew() {
     sudo -v
 }
 
-install_app_store_apps() {
-    printf "\n🛍️  (Skipping) Installing Mac App Store apps\n"
-    # mas install 497799835 # Xcode
-    # mas install 1451685025 # WireGuard
-    # mas install 1509590766 # Mutekey
-    # mas install 1195076754 # Pikka
-    sudo -v
-}
-
 mac_defaults_write() {
     printf "\n💻  Set macOS preferences\n"
     ./macos/.macos
@@ -180,6 +171,44 @@ set_startup_scripts() {
     # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
 }
 
+set_up_vscode() {
+     printf "\n✏️  Set up VScode\n"
+     cp ./vscode/settings.json ./.vscode/settings.json
+     cp ./vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+     cp ./vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
+     declare -a exts=(
+         # lint / format / syntax
+         "bungcip.better-toml"
+         "EditorConfig.EditorConfig"
+         "ms-python.python"
+         "ms-python.vscode-pylance"
+         "dbaeumer.vscode-eslint"
+         "esbenp.prettier-vscode"
+         "DavidAnson.vscode-markdownlint"
+         "mikestead.dotenv"
+         "christian-kohler.npm-intellisense"
+         "sibiraj-s.vscode-scss-formatter"
+         "ecmel.vscode-html-css"
+         "jeff-hykin.better-shellscript-syntax"
+         "bmalehorn.shell-syntax"
+         # theme & vscode UI
+         "teabyii.ayu"
+         "PKief.material-icon-theme"
+         "alexdima.copy-relative-path"
+         "devzstudio.emoji-snippets"
+         # frameworks / tooling
+         "ms-azuretools.vscode-docker"
+         "ms-vscode-remote.remote-containers"
+         "ms-vscode-remote.vscode-remote-extensionpack"
+         # Git & Github
+         "eamodio.gitlens"
+         "GitHub.copilot"
+         "donjayamanne.githistory"
+     )
+     for i in "${exts[@]}"; do
+         code --install-extension "$i"
+     done
+
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
@@ -187,15 +216,15 @@ sudo -v
 # create_dirs
 # build_xcode
 # install_brew
-# install_app_store_apps
 # mac_defaults_write
 # install_docker
 # configure_ruby
 # configure_node
-configure_python
+# configure_python
 # configure_vim
-# stow_dotfiles
+stow_dotfiles
 # set_up_touchid
+set_up_vscode
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
