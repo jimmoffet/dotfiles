@@ -2,6 +2,8 @@
 
 Cloned from Gretzky: [https://github.com/gretzky/dotfiles](https://github.com/gretzky/dotfiles)
 
+h/t to sobolevn: [https://github.com/sobolevn/dotfiles](https://github.com/sobolevn/dotfiles)
+
 Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 
 ![zsh with starship prompt and colorls](https://user-images.githubusercontent.com/15176096/71632895-ff0d0980-2bde-11ea-966f-65e5d564361f.png)

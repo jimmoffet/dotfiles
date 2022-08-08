@@ -1,5 +1,5 @@
 export PATH="/usr/local/sbin:$PATH"
-export EDITOR=nvim
+export EDITOR=nano
 
 # uncomment to run zprof
 # zmodload zsh/prof
@@ -8,15 +8,11 @@ export EDITOR=nvim
 HISTSIZE=50000
 SAVEHIST=10000
 
-
-
 source ~/antigen.zsh
 
 antigen bundles <<EOBUNDLES
-    tmux
     command-not-found
     colored-man-pages
-
     zsh-users/zsh-autosuggestions
     zsh-users/zsh-completions
     djui/alias-tips
@@ -35,8 +31,9 @@ source $HOME/dotfiles/zsh/.aliases
 chruby ruby-2.7.4
 
 # start tmux on open
-[[ $- != *i* ]] && return
-[[ -z "$TMUX" ]] && exec tmux
+# TODO: install pam_reattach and reactive tmux
+# [[ $- != *i* ]] && return
+# [[ -z "$TMUX" ]] && exec tmux
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/terraform terraform

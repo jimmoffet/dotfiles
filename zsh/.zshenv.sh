@@ -23,7 +23,7 @@ dev="$HOME/dev"
 
 # set the list of dirs that zsh searches for programs
 path=(
-    /usr/local/{bin,sbin}
+    /usr/local/{bin,sbin,share}
     /usr/{bin,sbin}
     /{bin,sbin}
     $path
