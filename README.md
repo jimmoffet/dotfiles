@@ -2,6 +2,8 @@
 
 Cloned from Gretzky: [https://github.com/gretzky/dotfiles](https://github.com/gretzky/dotfiles)
 
+h/t to sobolevn: [https://github.com/sobolevn/dotfiles](https://github.com/sobolevn/dotfiles)
+
 Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 
 ![zsh with starship prompt and colorls](https://user-images.githubusercontent.com/15176096/71632895-ff0d0980-2bde-11ea-966f-65e5d564361f.png)
@@ -15,11 +17,11 @@ Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 
 ## Installation
 
-**Before you get started** make sure you give full disk access permission to your terminal (for writing macos defaults). `System Preferences -> Privacy -> Full Disk Access`.
+**Before you get started** On a sparkling fresh installation of macOS:
 
-On a sparkling fresh installation of macOS:
+Give full disk access permission to your terminal (for writing macos defaults). `System Preferences -> Privacy -> Full Disk Access`.
 
-Install xcode from Mac App Store, then install dotfiles.
+Install xcode from the [Apple Developer website](https://developer.apple.com/download/applications/), then install dotfiles.
 
 To install:
 

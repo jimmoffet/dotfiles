@@ -3,8 +3,12 @@
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
+
 PATH=/usr/local/bin:/usr/local/sbin:"$PATH"
-PATH=/opt/local/bin:/opt/local/sbin:"$PATH"
+# PATH=/opt/local/bin:/opt/local/sbin:"$PATH" # do not exist on 2016 macbook pro
+
+# brew
+PATH=/usr/local/opt:/usr/local/share:"$PATH"
 
 # prefer US English & utf-8
 export LC_ALL="en_US.UTF-8"
@@ -14,23 +18,24 @@ export LANG="en_US"
 # https://stackoverflow.com/a/42265848/96656
 export GPG_TTY=$(tty)
 
-# brew
-PATH=$PATH:/opt/homebrew/bin
-
 # configure ruby
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
+# python
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH=$PYENV_ROOT/bin:$PATH
+eval "$(pyenv init -)"
 
 # npm global
-export NPM_PACKAGES="/usr/local/npm_packages"
+export NPM_PACKAGES="/usr/local"
 export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
 # yarn
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH="$(yarn global bin):$PATH"
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

@@ -1,0 +1,56 @@
+{
+  "editor.cursorSmoothCaretAnimation": false,
+  "editor.fontSize": 13,
+  "editor.fontFamily": "Hack Nerd Font",
+  "editor.fontLigatures": true,
+  "editor.formatOnSave": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.quickSuggestions.comments": true,
+  "editor.tabCompletion": "on",
+  "editor.rulers": [
+    120
+  ],
+  "editor.suggestSelection": "first",
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 120,
+  "eslint.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.format.enable": true,
+  "eslint.packageManager": "yarn",
+  "eslint.quiet": true,
+  "eslint.run": "onSave",
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/Pods": true
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "material-icon-theme.folders.theme": "specific",
+  "python.linting.enabled": false,
+  "python.jediEnabled": false,
+  "telemetry.enableCrashReporter": false,
+  "telemetry.enableTelemetry": false,
+  "terminal.external.osxExec": "Alacritty",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "window.title": "",
+  "workbench.colorTheme": "Ayu Mirage",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.statusBar.visible": true,
+  "zenMode.centerLayout": false,
+  "zenMode.fullScreen": false,
+  "zenMode.restore": true,
+  "workbench.activityBar.visible": false,
+  "search.mode": "newEditor",
+  // "workbench.colorCustomizations": {
+  //   "editorWarning.foreground": "#ffff00", // Warnings inside the file
+  //   "editorError.foreground": "#f66", // Errors inside the file
+  //   "list.warningForeground": "#e45bff", // Warnings on the file name
+  //   "list.errorForeground": "#f66", // Errors on the file name
+  // },
+  "git.decorations.enabled": true,
+}

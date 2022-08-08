@@ -30,7 +30,7 @@
         "--ignore=E121,E126,E202,E203,E302,E305,E401,E402,E501,E614,E703,E722,F401,F402,F403,F811,F821,F841,W292,W391,W401,W503,W605,W614,W702,W703,N803,C0103,C0114,C0115,C0116"
     ],
     "python.formatting.blackArgs": [
-        "--max-line-length=180",    
+        "--max-line-length=180",
     ],
     "python.analysis.extraPaths": [
         "./",
@@ -39,17 +39,17 @@
         "env/lib/python3.8/site-packages",
         "."
     ],
+    "python.linting.pylintEnabled": true,
+    "python.linting.flake8Enabled": false,
     "python.formatting.provider": "black",
     "editor.formatOnSave": false,
     "git.ignoreLimitWarning": true,
     "search.mode": "newEditor",
-    "python.linting.pylintEnabled": true,
-    "python.linting.flake8Enabled": false,
     "workbench.colorCustomizations": {
-        "editorWarning.foreground": "#ffff00",  // Warnings inside the file
-        "editorError.foreground": "#f66",       // Errors inside the file
-        "list.warningForeground": "#e45bff",    // Warnings on the file name
-        "list.errorForeground": "#f66",         // Errors on the file name
+        "editorWarning.foreground": "#ffff00", // Warnings inside the file
+        "editorError.foreground": "#f66", // Errors inside the file
+        "list.warningForeground": "#e45bff", // Warnings on the file name
+        "list.errorForeground": "#f66", // Errors on the file name
     },
-    "git.decorations.enabled": true
+    "git.decorations.enabled": true,
 }
