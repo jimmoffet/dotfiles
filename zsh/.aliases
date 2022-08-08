@@ -7,6 +7,31 @@
 # 	alias git=$hub_path
 # fi
 
+LIGHTBLUE="\e[94m"
+ENDCOLOR="\e[0m"
+
+# find stuff
+findall() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o $@ -print
+  echo "\n${LIGHTBLUE}Tip: findall -type d -name 'screenshots'${ENDCOLOR}"
+}
+
+finddir() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type d -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: finddir scrEenShotS${ENDCOLOR}"
+}
+
+findfile() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type f -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: findfile brEW${ENDCOLOR}"
+}
+
+findin() {
+	find $1 -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type $2 -iname $3 -print
+  echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
+}
+
+# git
 alias g="git"
 
 # one letter aliases w/o options
@@ -48,8 +73,8 @@ alias gchp="git cherry-pick"
 alias gcl="git clone"
 
 # commit
-alias gc="git commit -am"
-alias gcm="git commit --amend --message"
+alias gcm="git commit -m"
+alias gcam="git commit --amend --message"
 
 # diff
 alias gdt="git difftool"
