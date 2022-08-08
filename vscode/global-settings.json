@@ -4,6 +4,7 @@
   "editor.fontFamily": "Hack Nerd Font",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
+  "editor.inlineSuggest.enabled": true,
   "editor.quickSuggestions.comments": true,
   "editor.tabCompletion": "on",
   "editor.rulers": [
@@ -52,5 +53,4 @@
   //   "list.errorForeground": "#f66", // Errors on the file name
   // },
   "git.decorations.enabled": true,
-  "editor.inlineSuggest.enabled": true,
 }

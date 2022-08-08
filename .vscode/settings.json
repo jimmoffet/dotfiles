@@ -25,6 +25,7 @@
   "editor.formatOnSave": true,
   "editor.glyphMargin": false,
   "editor.hideCursorInOverviewRuler": false,
+  "editor.inlineSuggest.enabled": true,
   "editor.minimap.enabled": false,
   "editor.occurrencesHighlight": false,
   "editor.overviewRulerBorder": false,
@@ -59,6 +60,8 @@
     ".eslintrc": "jsonc",
     "*.pyi": "python",
     "*.bats": "shellscript",
+    "*.sh": "shellscript",
+    "*.nanorc": "shellscript",
   },
   "files.autoSave": "onFocusChange",
   "files.exclude": {
