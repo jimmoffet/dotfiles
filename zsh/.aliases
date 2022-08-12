@@ -7,7 +7,65 @@
 # 	alias git=$hub_path
 # fi
 
+# run dotfiles functions
+# alias dot='/Users/jamesdmoffet/dotfiles/install.sh $@'
+dot() {
+  if [ "$1"=="list" ] || [ "$1"=="help" ];
+    then
+      declare -a funcs=(
+          "create_dirs"
+          "build_xcode"
+          "install_brew"
+          "mac_defaults_write"
+          "install_docker"
+          "configure_ruby"
+          "configure_node"
+          "configure_python"
+          "configure_vim"
+          "set_up_aws"
+          "stow_dotfiles"
+          "set_up_vscode"
+      )
+      for i in "${funcs[@]}"; do
+          printf "dot $i\n"
+      done
+    else
+      /Users/jamesdmoffet/dotfiles/install.sh $@
+  fi
+}
+
+LIGHTBLUE="\e[94m"
+ENDCOLOR="\e[0m"
+
+# find stuff
+findall() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o $@ -print
+  echo "\n${LIGHTBLUE}Tip: findall -type d -name 'screenshots'${ENDCOLOR}"
+}
+
+finddir() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type d -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: finddir scrEenShotS${ENDCOLOR}"
+}
+
+findfile() {
+	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type f -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: findfile brEW${ENDCOLOR}"
+}
+
+findin() {
+	find $1 -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type $2 -iname $3 -print
+  echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
+}
+
 alias g="git"
+
+gitgo() {
+	git add .
+  git commit -m $1
+  git push
+  echo "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}"
+}
 
 # one letter aliases w/o options
 alias ga="git add"
@@ -403,21 +461,21 @@ pyenv() {
 }
 
 # Loads `.env` file from a filename passed as an argument
- loadenv () {
-   while read line; do
-     if [ "${line:0:1}" = '#' ]; then
-       continue  # comments are ignored
-     fi
-     export $line > /dev/null
-   done < "$1"
-   echo 'Loaded!'
- }
+loadenv() {
+  while read line; do
+    if [ "${line:0:1}" = '#' ]; then
+      continue  # comments are ignored
+    fi
+    export $line > /dev/null
+  done < "$1"
+  echo 'Loaded!'
+}
 
 
  # Sets up all my working env
- workon () {
-   if _z 2>&1 "$1"; then
-     source '.venv/bin/activate' || true  # There might be no `.venv`
-     code .
-   fi
- }
+workon() {
+  if _z 2>&1 "$1"; then
+    source '.venv/bin/activate' || true  # There might be no `.venv`
+    code .
+  fi
+}
