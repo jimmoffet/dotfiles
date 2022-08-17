@@ -2,8 +2,6 @@
 
 create_dirs() {
     printf "\n🗄  Creating directories\n"
-    ## Ask for admin password if not within timeout, else restart timeout clock
-    sudo -v
     declare -a dirs=(
         "$HOME/Desktop/screenshots"
         "$HOME/dev"
@@ -39,7 +37,7 @@ install_brew() {
         # install homebrew
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # set path
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+        eval "$($mybrewpath shellenv)"
     fi
     printf "Installing rosetta before homebrew..."
     sudo softwareupdate --install-rosetta --agree-to-license
@@ -85,8 +83,8 @@ configure_ruby() {
     printf "\n🌈  Configure Ruby\n"
     ruby-install ruby-2.7.4 1>/dev/null
     sudo -v
-    source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-    source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+    source $mybrewpackages/chruby/chruby.sh
+    source $mybrewpackages/chruby/auto.sh
     chruby ruby-2.7.4
     # disable downloading documentation
     echo "gem: --no-document" >> ~/.gemrc
@@ -141,11 +139,16 @@ configure_vim() {
     sudo -v
 }
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+## Ask for admin password if not within timeout, else restart timeout clock
+sudo -v
+
 stow_dotfiles() {
     printf "\n🐗  Stow dotfiles\n"
-    rm ~/.zshrc
-    rm ~/.gitconfig
-    stow alacritty colorls fzf git nvim yabai skhd starship tmux vim z zsh
+    # rm ~/.zshrc
+    # rm ~/.gitconfig
+    stow colorls fzf git nvim yabai skhd starship tmux vim z zsh
     sudo -v
 }
 
@@ -171,7 +174,23 @@ set_startup_scripts() {
     sudo chmod a+x ./startup/setuptouchid.sh
     sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
     # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    
+    printf "\n🎬 Set up startup scripts\n"
+    sudo chmod 755 ./startup/remove-quarantine-downloads.sh
+    sudo cp ./startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
+    sudo chmod 755 ./startup/remove-quarantine-documents.sh
+    sudo cp ./startup/remove-quarantine-documents.sh $HOME/remove-quarantine-documents.sh
+    # sudo chmod 755 ./startup/remove-quarantine-applications.sh
+    # sudo cp ./startup/remove-quarantine-applications.sh $HOME/remove-quarantine-applications.sh
+
+    watchman watch ~/Downloads
+    watchman -- trigger ~/Downloads removequarantine '*' -- ~/remove-quarantine-downloads.sh
+    watchman watch ~/Documents
+    watchman -- trigger ~/Documents removequarantine '*' -- ~/remove-quarantine-documents.sh
+    # sudo watchman watch Applications
+    # sudo watchman -- trigger Applications removequarantine '*' -- ~/remove-quarantine-applications.sh
 }
+
 set_up_vscode() {
     printf "\n✏️  Set up VScode\n"
     cp ./vscode/settings.json ./.vscode/settings.json
@@ -228,6 +247,7 @@ set_up_aws() {
 # configure_node
 # configure_python
 # configure_vim
+# set_startup_scripts
 # set_up_aws
 # stow_dotfiles
 # set_up_vscode

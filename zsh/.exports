@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
 
 PATH=/usr/local/bin:/usr/local/sbin:"$PATH"
-PATH=/opt/local/bin:/opt/local/sbin:"$PATH"
+PATH=/opt/local/bin:/opt/local/sbin:"$PATH" # this is different on 2016 macbook pro
+
+# brew
+# PATH=/usr/local/opt:/usr/local/share:"$PATH" # this is correct on 2016 macbook pro
 
 # brew
 PATH=/opt/homebrew/bin:"$PATH"
@@ -20,11 +25,9 @@ export LANG="en_US"
 # https://stackoverflow.com/a/42265848/96656
 export GPG_TTY=$(tty)
 
-
-
 # configure ruby
-source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+source $mybrewpackages/chruby/chruby.sh
+source $mybrewpackages/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
@@ -39,7 +42,6 @@ export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
 # yarn
-# export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PATH="$(yarn global bin):$PATH" # TODO: validate this
 
 # fzf
