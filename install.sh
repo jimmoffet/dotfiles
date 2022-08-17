@@ -53,7 +53,7 @@ install_brew() {
 
 mac_defaults_write() {
     printf "\n💻  Set macOS preferences\n"
-    ./macos/.macos
+    $HOME/dotfiles/macos/.macos
     sudo -v
 }
 
@@ -73,7 +73,7 @@ install_docker() {
         sudo hdiutil attach Docker.dmg
         sudo /Volumes/Docker/Docker.app/Contents/MacOS/install
         sudo hdiutil detach /Volumes/Docker
-        sudo rm ./Docker.dmg
+        sudo rm $HOME/dotfiles/Docker.dmg
     fi
     printf "DOCKER IN APPS BUT YOU STILL NEED TO LAUNCH IT"
     sudo -v
@@ -166,17 +166,17 @@ set_up_touchid() {
 
 set_startup_scripts() {
     printf "\n🎬 Set up startup scripts\n"
-    sudo chmod a+x ./startup/setuptouchid.sh
-    sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
-    # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    sudo chmod a+x $HOME/dotfiles/startup/setuptouchid.sh
+    sudo ln -s $HOME/dotfiles/startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
+    # sudo cp $HOME/dotfiles/startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
 
     printf "\n🎬 Set up startup scripts\n"
-    sudo chmod 755 ./startup/remove-quarantine-downloads.sh
-    sudo cp ./startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
-    sudo chmod 755 ./startup/remove-quarantine-documents.sh
-    sudo cp ./startup/remove-quarantine-documents.sh $HOME/remove-quarantine-documents.sh
-    # sudo chmod 755 ./startup/remove-quarantine-applications.sh
-    # sudo cp ./startup/remove-quarantine-applications.sh $HOME/remove-quarantine-applications.sh
+    sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-downloads.sh
+    sudo cp $HOME/dotfiles/startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
+    sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-documents.sh
+    sudo cp $HOME/dotfiles/startup/remove-quarantine-documents.sh $HOME/remove-quarantine-documents.sh
+    # sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-applications.sh
+    # sudo cp $HOME/dotfiles/startup/remove-quarantine-applications.sh $HOME/remove-quarantine-applications.sh
 
     watchman watch ~/Downloads
     watchman -- trigger ~/Downloads removequarantine '*' -- ~/remove-quarantine-downloads.sh
@@ -188,9 +188,9 @@ set_startup_scripts() {
 
 set_up_vscode() {
     printf "\n✏️  Set up VScode\n"
-    cp ./vscode/settings.json ./.vscode/settings.json
-    cp ./vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
-    cp ./vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
+    cp $HOME/dotfiles/vscode/global-settings.json $HOME/dotfiles/.vscode/settings.json
+    cp $HOME/dotfiles/vscode/global-settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+    cp $HOME/dotfiles/vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
     declare -a exts=(
         # lint / format / syntax
         "bungcip.better-toml"

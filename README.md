@@ -9,7 +9,7 @@ Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
 ![zsh with starship prompt and colorls](https://user-images.githubusercontent.com/15176096/71632895-ff0d0980-2bde-11ea-966f-65e5d564361f.png)
 ![vim and tmux](https://user-images.githubusercontent.com/15176096/71633424-2f09dc00-2be2-11ea-9c15-a4f492b7ea68.png)
 
-- Terminal: [Alacritty](https://github.com/jwilm/alacritty) using zsh w/ [starship prompt](https://starship.rs/) and [color-ls](https://github.com/athityakumar/colorls)
+- Terminal: [iTerm](https://github.com/gnachman/iTerm2) using zsh w/ [starship prompt](https://starship.rs/) and [color-ls](https://github.com/athityakumar/colorls)
 - Window management: [yabai](https://github.com/koekeishiya/yabai)
 - Hotkeys: [skhd](https://github.com/koekeishiya/skhd)
 - Vim: [neovim](https://neovim.io/) with [vim-plug](https://github.com/junegunn/vim-plug) to manage plugins
@@ -33,10 +33,11 @@ This will fetch [run.sh](https://raw.githubusercontent.com/jimmoffet/dotfiles/ma
 
 - Configs for the following tools:
   - git
-  - [Alacritty](./alacritty)
   - [colorls](./colorls)
   - [fzf](./fzf)
+  - [iTerm](./iterm)
   - [neovim](./nvim)
+  - [nano](./nano)
   - [skhd](./skhd)
   - [starship](./starship)
   - [tmux](./tmux)
@@ -65,7 +66,6 @@ The install script will also setup Python and Node versions/environments:
 
 #### Color Schemes
 
-- Alacritty color scheme is [Snazzy](https://github.com/sindresorhus/terminal-snazzy)
 - VSCode/Vim color scheme is [Ayu](https://github.com/dempfi/ayu)
 - The macOS ['highlight color'](https://github.com/gretzky/dotfiles/blob/main/macos/.macos#L22-L23) (accent color for mac, typically blue) is set to pink. To set it to a different color:
   - Pick your desired color and get its RGB value (ex. pink is `255,105,180`)
