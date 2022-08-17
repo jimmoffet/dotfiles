@@ -13,10 +13,10 @@ set constantshow
 
 set mouse
 
-
 # Extra files:
 set backup
 # set backupdir "~/.nano-backups"
+
 set historylog
 
 # line numbers are copied with text,

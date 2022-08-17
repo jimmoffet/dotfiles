@@ -91,6 +91,7 @@ alias gpl="git pull"
 
 # adding
 alias gaa="git add ."
+alias gcm="git commit -m"
 alias gap="git add --patch"
 alias gau="git add --update"
 
@@ -350,6 +351,11 @@ gi() {
 	curl -L -s https://www.gitignore.io/api/$@
 }
 
+# cloud foundry
+
+# login
+alias cflogin="cf login -a api.fr.cloud.gov --sso"
+
 # create a remote repo
 create-repo() {
 	# Get user input
@@ -459,7 +465,7 @@ pyenv() {
 }
 
 # Loads `.env` file from a filename passed as an argument
-loadenv () {
+loadenv() {
   while read line; do
     if [ "${line:0:1}" = '#' ]; then
       continue  # comments are ignored
@@ -469,9 +475,8 @@ loadenv () {
   echo 'Loaded!'
 }
 
-
-# Sets up all my working env
-workon () {
+ # Sets up all my working env
+workon() {
   if _z 2>&1 "$1"; then
     source '.venv/bin/activate' || true  # There might be no `.venv`
     code .

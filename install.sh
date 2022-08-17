@@ -139,6 +139,11 @@ configure_vim() {
     sudo -v
 }
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+## Ask for admin password if not within timeout, else restart timeout clock
+sudo -v
+
 stow_dotfiles() {
     printf "\n🐗  Stow dotfiles\n"
     # rm ~/.zshrc
@@ -147,24 +152,29 @@ stow_dotfiles() {
     sudo -v
 }
 
-# set_up_touchid() {
-#     printf "\n☝️  Set up Touch ID\n"
-#     if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-#         then
-#             printf "\nTouch ID is set up for sudo!\n"
-#         else
-#             printf "\nTouch ID is not set up for sudo, setting it up now...\n"
-#             grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
-#     fi
-#     if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-#         then
-#             printf "\nTouch ID set up succeeded!\n"
-#         else
-#             printf "\nTouch ID set up failed!\n"
-#     fi
-# }
+set_up_touchid() {
+    printf "\n☝️  Set up Touch ID\n"
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
+        then
+            printf "\nTouch ID is set up for sudo!\n"
+        else
+            printf "\nTouch ID is not set up for sudo, setting it up now...\n"
+            grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
+    fi
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
+        then
+            printf "\nTouch ID set up succeeded!\n"
+        else
+            printf "\nTouch ID set up failed!\n"
+    fi
+}
 
 set_startup_scripts() {
+    printf "\n🎬 Set up startup scripts\n"
+    sudo chmod a+x ./startup/setuptouchid.sh
+    sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
+    # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    
     printf "\n🎬 Set up startup scripts\n"
     sudo chmod 755 ./startup/remove-quarantine-downloads.sh
     sudo cp ./startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
@@ -214,6 +224,7 @@ set_up_vscode() {
         "eamodio.gitlens"
         "GitHub.copilot"
         "donjayamanne.githistory"
+        "grimmer.vscode-back-forward-button"
     )
     for i in "${exts[@]}"; do
         code --install-extension "$i"
@@ -221,10 +232,10 @@ set_up_vscode() {
 
 }
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
-
-## Ask for admin password if not within timeout, else restart timeout clock
-sudo -v
+set_up_aws() {
+    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    sudo installer -pkg AWSCLIV2.pkg -target /
+}
 
 ## RUN THE THINGS
 # create_dirs
@@ -236,9 +247,10 @@ sudo -v
 # configure_node
 # configure_python
 # configure_vim
+# set_startup_scripts
+# set_up_aws
 # stow_dotfiles
 # set_up_vscode
-# set_startup_scripts
 
 
 printf "\n✨  Done!\n"
