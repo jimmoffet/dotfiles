@@ -7,10 +7,10 @@ PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
 
 PATH=/usr/local/bin:/usr/local/sbin:"$PATH"
-# PATH=/opt/local/bin:/opt/local/sbin:"$PATH" # do not exist on 2016 macbook pro
+PATH=/opt/local/bin:/opt/local/sbin:"$PATH" # this is different on 2016 macbook pro
 
 # brew
-PATH=/usr/local/opt:/usr/local/share:"$PATH"
+# PATH=/usr/local/opt:/usr/local/share:"$PATH" # this is correct on 2016 macbook pro
 
 # brew
 PATH=/opt/homebrew/bin:"$PATH"
