@@ -59,7 +59,6 @@ brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 
 cask "airpass"
-cask "alacritty"
 cask "alfred"
 cask "boop"
 cask "dozer"
