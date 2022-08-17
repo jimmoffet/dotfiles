@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
@@ -19,8 +21,8 @@ export LANG="en_US"
 export GPG_TTY=$(tty)
 
 # configure ruby
-source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh
+source $mybrewpackages/chruby/chruby.sh
+source $mybrewpackages/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'

@@ -37,7 +37,7 @@ install_brew() {
         # install homebrew
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # set path
-        eval "$(/usr/local/Homebrew/bin/brew shellenv)"
+        eval "$($mybrewpath shellenv)"
     fi
     printf "Installing rosetta before homebrew..."
     sudo softwareupdate --install-rosetta --agree-to-license
@@ -83,8 +83,8 @@ configure_ruby() {
     printf "\n🌈  Configure Ruby\n"
     ruby-install ruby-2.7.4 1>/dev/null
     sudo -v
-    source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-    source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+    source $mybrewpackages/chruby/chruby.sh
+    source $mybrewpackages/chruby/auto.sh
     chruby ruby-2.7.4
     # disable downloading documentation
     echo "gem: --no-document" >> ~/.gemrc
@@ -141,9 +141,9 @@ configure_vim() {
 
 stow_dotfiles() {
     printf "\n🐗  Stow dotfiles\n"
-    rm ~/.zshrc
-    rm ~/.gitconfig
-    stow alacritty colorls fzf git nvim yabai skhd starship tmux vim z zsh
+    # rm ~/.zshrc
+    # rm ~/.gitconfig
+    stow colorls fzf git nvim yabai skhd starship tmux vim z zsh
     sudo -v
 }
 
@@ -221,6 +221,8 @@ set_up_vscode() {
 
 }
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
@@ -236,8 +238,10 @@ sudo -v
 # configure_vim
 # stow_dotfiles
 # set_up_vscode
-set_startup_scripts
+# set_startup_scripts
 
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
+
+"$@"

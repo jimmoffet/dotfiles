@@ -7,6 +7,36 @@
 # 	alias git=$hub_path
 # fi
 
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+alias boop='open -a boop'
+
+dot() {
+
+  if [ "$1" = "help" ]; then
+      echo "Usage: dot <command>"
+      declare -a funcs=(
+          "create_dirs"
+          "build_xcode"
+          "install_brew"
+          "mac_defaults_write"
+          "install_docker"
+          "configure_ruby"
+          "configure_node"
+          "configure_python"
+          "configure_vim"
+          "set_up_aws"
+          "stow_dotfiles"
+          "set_up_vscode"
+      )
+      for i in "${funcs[@]}"; do
+          printf "dot $i\n"
+      done
+    else
+      $HOME/dotfiles/install.sh $@
+  fi
+}
+
 LIGHTBLUE="\e[94m"
 ENDCOLOR="\e[0m"
 
