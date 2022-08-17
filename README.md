@@ -1,7 +1,6 @@
 # dotfiles
 
 Cloned from Gretzky: [https://github.com/gretzky/dotfiles](https://github.com/gretzky/dotfiles)
-h/t to sobolevn: [https://github.com/sobolevn/dotfiles](https://github.com/sobolevn/dotfiles)
 
 h/t to sobolevn: [https://github.com/sobolevn/dotfiles](https://github.com/sobolevn/dotfiles)
 
