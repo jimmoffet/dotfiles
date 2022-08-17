@@ -6,16 +6,10 @@ export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export PATH
 
-PATH=/usr/local/bin:/usr/local/sbin:"$PATH"
-PATH=/opt/local/bin:/opt/local/sbin:"$PATH" # this is different on 2016 macbook pro
-
-# brew
-# PATH=/usr/local/opt:/usr/local/share:"$PATH" # this is correct on 2016 macbook pro
-
-# brew
-PATH=/opt/homebrew/bin:"$PATH"
-PATH=/opt/homebrew/sbin:"$PATH"
-
+PATH=/usr/local/bin:/usr/local/sbin:$PATH
+PATH=/opt/local/bin:/opt/local/sbin:$PATH # this is for 2020 M1 macbook
+PATH=/opt/homebrew/bin:/opt/homebrew/sbin:$PATH # this is for 2020 M1 macbook
+PATH=/usr/local/opt:/usr/local/share:$PATH # this is for 2016 intel macbook
 
 # prefer US English & utf-8
 export LC_ALL="en_US.UTF-8"

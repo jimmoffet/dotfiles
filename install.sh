@@ -139,11 +139,6 @@ configure_vim() {
     sudo -v
 }
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
-
-## Ask for admin password if not within timeout, else restart timeout clock
-sudo -v
-
 stow_dotfiles() {
     printf "\n🐗  Stow dotfiles\n"
     # rm ~/.zshrc
@@ -174,7 +169,7 @@ set_startup_scripts() {
     sudo chmod a+x ./startup/setuptouchid.sh
     sudo ln -s ./startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
     # sudo cp ./startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
-    
+
     printf "\n🎬 Set up startup scripts\n"
     sudo chmod 755 ./startup/remove-quarantine-downloads.sh
     sudo cp ./startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
@@ -236,6 +231,11 @@ set_up_aws() {
     curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
     sudo installer -pkg AWSCLIV2.pkg -target /
 }
+
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+## Ask for admin password if not within timeout, else restart timeout clock
+sudo -v
 
 ## RUN THE THINGS
 # create_dirs
