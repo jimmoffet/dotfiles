@@ -20,8 +20,8 @@ export LANG="en_US"
 export GPG_TTY=$(tty)
 
 # configure ruby
-source $mybrewpackages/chruby/chruby.sh
-source $mybrewpackages/chruby/auto.sh
+source $mybrewpackages/chruby/share/chruby/chruby.sh
+source $mybrewpackages/chruby/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'

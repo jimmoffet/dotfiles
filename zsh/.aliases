@@ -12,7 +12,6 @@ export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 alias boop='open -a boop'
 
 dot() {
-
   if [ "$1" = "help" ]; then
       echo "Usage: dot <command>"
       declare -a funcs=(
