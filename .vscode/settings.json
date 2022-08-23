@@ -56,4 +56,5 @@
         "list.errorForeground": "#f66", // Errors on the file name
     },
     "git.decorations.enabled": true,
+    "editor.experimental.stickyScroll.enabled": true,
 }

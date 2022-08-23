@@ -10,7 +10,7 @@
 # run dotfiles functions
 # alias dot='/Users/jamesdmoffet/dotfiles/install.sh $@'
 dot() {
-  if [ "$1"=="list" ] || [ "$1"=="help" ];
+  if [ "$1"="help" ];
     then
       declare -a funcs=(
           "create_dirs"
