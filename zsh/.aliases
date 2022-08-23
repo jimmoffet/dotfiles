@@ -7,11 +7,13 @@
 # 	alias git=$hub_path
 # fi
 
-# run dotfiles functions
-# alias dot='/Users/jamesdmoffet/dotfiles/install.sh $@'
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+alias boop='open -a boop'
+
 dot() {
-  if [ "$1"="help" ];
-    then
+  if [ "$1" = "help" ]; then
+      echo "Usage: dot <command>"
       declare -a funcs=(
           "create_dirs"
           "build_xcode"
@@ -30,7 +32,7 @@ dot() {
           printf "dot $i\n"
       done
     else
-      /Users/jamesdmoffet/dotfiles/install.sh $@
+      $HOME/dotfiles/install.sh $@
   fi
 }
 
@@ -58,6 +60,7 @@ findin() {
   echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
 }
 
+# git
 alias g="git"
 
 gitgo() {
@@ -107,8 +110,8 @@ alias gchp="git cherry-pick"
 alias gcl="git clone"
 
 # commit
-alias gc="git commit -am"
-alias gcm="git commit --amend --message"
+alias gcm="git commit -m"
+alias gcam="git commit --amend --message"
 
 # diff
 alias gdt="git difftool"
@@ -470,7 +473,6 @@ loadenv() {
   done < "$1"
   echo 'Loaded!'
 }
-
 
  # Sets up all my working env
 workon() {
