@@ -8,7 +8,7 @@ create_dirs() {
         "/usr/local/bin"
     )
     for i in "${dirs[@]}"; do
-        sudo mkdir "$i"
+        mkdir "$i"
     done
     sudo chown -R "$USER":admin /usr/local/*
 }
