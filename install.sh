@@ -8,7 +8,7 @@ create_dirs() {
         "/usr/local/bin"
     )
     for i in "${dirs[@]}"; do
-        sudo mkdir "$i"
+        mkdir "$i"
     done
     sudo chown -R "$USER":admin /usr/local/*
 }
@@ -49,6 +49,12 @@ install_brew() {
     brew bundle
     brew link --overwrite cocoapods
     sudo -v
+}
+
+wipe_finder_prefs() {
+  # Destroy existing finder preferences for all folders
+  sudo find / -name ".DS_Store"  -exec rm {} \;
+  sudo -v
 }
 
 mac_defaults_write() {
@@ -186,6 +192,11 @@ set_startup_scripts() {
     # sudo watchman -- trigger Applications removequarantine '*' -- ~/remove-quarantine-applications.sh
 }
 
+set_up_aws() {
+    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    sudo installer -pkg AWSCLIV2.pkg -target /
+}
+
 set_up_vscode() {
     printf "\n✏️  Set up VScode\n"
     cp $HOME/dotfiles/vscode/global-settings.json $HOME/dotfiles/.vscode/settings.json
@@ -227,21 +238,19 @@ set_up_vscode() {
 
 }
 
-set_up_aws() {
-    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-    sudo installer -pkg AWSCLIV2.pkg -target /
-}
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
+
+export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
 ## RUN THE THINGS
 # create_dirs
 # build_xcode
 # install_brew
 # mac_defaults_write
+# wipe_finder_prefs
 # install_docker
 # configure_ruby
 # configure_node
