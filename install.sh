@@ -1,5 +1,17 @@
 #!/bin/bash
 
+printf "DETECTING HARDWARE...\n"
+if [[ $(uname -m) == 'arm64' ]]; then
+    printf "Found Apple silicon\n"
+    export mybrewpath=/opt/homebrew/bin/brew
+    export mybrewpackages=/opt/homebrew/opt
+fi
+if [[ $(uname -m) == 'x86_64' ]]; then
+    printf "Found Intel silicon\n"
+    export mybrewpath=/usr/local/Homebrew/bin/brew
+    export mybrewpackages=/usr/local/share
+fi
+
 create_dirs() {
     printf "\n🗄  Creating directories\n"
     declare -a dirs=(
@@ -238,31 +250,32 @@ set_up_vscode() {
 
 }
 
-
-
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+## RUN ALL THE THINGS
+all() {
+  create_dirs
+  build_xcode
+  install_brew
+  mac_defaults_write
+  wipe_finder_prefs
+  install_docker
+  configure_ruby
+  configure_node
+  configure_python
+  configure_vim
+  set_startup_scripts
+  set_up_aws
+  stow_dotfiles
+  set_up_vscode
+  printf "\n✨  Done!\n"
+  printf "(don't forget to launch docker desktop for the first time)\n"
+}
 
-## RUN THE THINGS
-# create_dirs
-# build_xcode
-# install_brew
-# mac_defaults_write
-# wipe_finder_prefs
-# install_docker
-# configure_ruby
-# configure_node
-# configure_python
-# configure_vim
-# set_startup_scripts
-# set_up_aws
-# stow_dotfiles
-# set_up_vscode
-
-
-printf "\n✨  Done!\n"
-printf "(don't forget to launch docker desktop for the first time)\n"
+if [[ "$@" = "" ]]; then
+    printf "Let's run it all!\n"
+    all
+fi
 
 "$@"
