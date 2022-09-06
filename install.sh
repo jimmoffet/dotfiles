@@ -255,20 +255,20 @@ sudo -v
 
 ## RUN ALL THE THINGS
 all() {
-  create_dirs
-  build_xcode
-  install_brew
-  mac_defaults_write
-  wipe_finder_prefs
-  install_docker
-  configure_ruby
-  configure_node
-  configure_python
-  configure_vim
-  set_startup_scripts
-  set_up_aws
-  stow_dotfiles
-  set_up_vscode
+  # create_dirs
+  # build_xcode
+  # install_brew
+  # mac_defaults_write
+  # wipe_finder_prefs
+  # install_docker
+  # configure_ruby
+  # configure_node
+  # configure_python
+  # configure_vim
+  # set_startup_scripts
+  # set_up_aws
+  # stow_dotfiles
+  # set_up_vscode
   printf "\n✨  Done!\n"
   printf "(don't forget to launch docker desktop for the first time)\n"
 }
