@@ -10,7 +10,9 @@ create_dirs() {
     for i in "${dirs[@]}"; do
         sudo mkdir "$i"
     done
+    sudo chown -R "$USER":admin /usr/local
     sudo chown -R "$USER":admin /usr/local/*
+    sudo chown -R "$USER":admin $HOME
 }
 
 build_xcode() {
@@ -168,9 +170,8 @@ set_startup_scripts() {
     printf "\n🎬 Set up startup scripts\n"
     sudo chmod a+x $HOME/dotfiles/startup/setuptouchid.sh
     sudo ln -s $HOME/dotfiles/startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
-    # sudo cp $HOME/dotfiles/startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    $HOME/dotfiles/startup/setuptouchid.sh
 
-    printf "\n🎬 Set up startup scripts\n"
     sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-downloads.sh
     sudo cp $HOME/dotfiles/startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
     sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-documents.sh
