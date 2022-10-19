@@ -3,13 +3,13 @@
 printf "DETECTING HARDWARE...\n"
 if [[ $(uname -m) == 'arm64' ]]; then
     printf "Found Apple silicon\n"
-    export mybrewpath=/opt/homebrew/bin/brew
-    export mybrewpackages=/opt/homebrew/opt
+    mybrewpath=/opt/homebrew/bin/brew
+    mybrewpackages=/opt/homebrew/opt
 fi
 if [[ $(uname -m) == 'x86_64' ]]; then
     printf "Found Intel silicon\n"
-    export mybrewpath=/usr/local/Homebrew/bin/brew
-    export mybrewpackages=/usr/local/share
+    mybrewpath=/usr/local/Homebrew/bin/brew
+    mybrewpackages=/usr/local/share
 fi
 
 create_dirs() {

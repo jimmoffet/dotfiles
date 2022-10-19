@@ -10,6 +10,7 @@ cask_args appdir: "/Applications"
 
 brew "ack"
 brew "applesimutils"
+brew "awscli"
 brew "binutils"
 brew "ccat"
 brew "chruby"

@@ -7,7 +7,7 @@
 # 	alias git=$hub_path
 # fi
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+# export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
 alias boop='open -a boop'
 
@@ -473,6 +473,10 @@ loadenv() {
     export $line > /dev/null
   done < "$1"
   echo 'Loaded!'
+}
+
+venv() {
+  source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
 }
 
  # Sets up all my working env
