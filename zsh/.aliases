@@ -487,16 +487,16 @@ loadenv() {
   echo 'Loaded!'
 }
 
-alias activate='source .venv/bin/activate'
+alias activate='source venv/bin/activate'
 
 venv() {
-	source .venv/bin/activate &> /dev/null || python -m venv .venv && source .venv/bin/activate
+	source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
 }
 
 # Sets up all my working env
 workon() {
   if _z 2>&1 "$1"; then
-    source '.venv/bin/activate' || true  # There might be no `.venv`
+    source 'venv/bin/activate' || true  # There might be no `venv`
     code .
   fi
 }
