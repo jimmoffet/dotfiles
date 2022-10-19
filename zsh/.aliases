@@ -1,13 +1,29 @@
 #!/usr/bin/env bash
 
-# # use `hub` as git wrapper
-# # http://defunkt.github.com/hub/
-# hub_path=$(which hub)
-# if (($ + commands[hub])); then
-# 	alias git=$hub_path
-# fi
 
 # export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+
+# cloud foundry
+
+# login
+alias cflogin="cf login -a api.fr.cloud.gov --sso"
+
+# execute command in a new Terminal.app window
+newterm() {
+  var=$@
+  osascript -  "$var"  <<EOF
+    on run argv -- argv is a list of strings
+      tell application "Terminal"
+        activate
+        delay 3
+        do script (item 1 of argv)
+        delay 1
+        close the front window
+      end tell
+    end run
+EOF
+}
+
 
 alias boop='open -a boop'
 
@@ -88,6 +104,7 @@ alias gma="git merge --abort"
 
 # pull
 alias gpl="git pull"
+alias gfp="git fetch --all && git pull --all"
 
 # adding
 alias gaa="git add ."
@@ -351,11 +368,6 @@ gi() {
 	curl -L -s https://www.gitignore.io/api/$@
 }
 
-# cloud foundry
-
-# login
-alias cflogin="cf login -a api.fr.cloud.gov --sso"
-
 # create a remote repo
 create-repo() {
 	# Get user input
@@ -475,11 +487,13 @@ loadenv() {
   echo 'Loaded!'
 }
 
+alias activate='source .venv/bin/activate'
+
 venv() {
-  source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
+	source .venv/bin/activate &> /dev/null || python -m venv .venv && source .venv/bin/activate
 }
 
- # Sets up all my working env
+# Sets up all my working env
 workon() {
   if _z 2>&1 "$1"; then
     source '.venv/bin/activate' || true  # There might be no `.venv`
