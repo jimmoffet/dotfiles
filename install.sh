@@ -251,6 +251,13 @@ set_up_vscode() {
 
 }
 
+install_fargate_cli() {
+    printf "\n🐳  Install fargate cli\n"
+    curl -LO https://github.com/awslabs/fargatecli/releases/download/0.3.2/fargate-0.3.2-darwin-amd64.zip
+    unzip fargate-0.3.2-darwin-amd64.zip
+    mv fargate /usr/local/bin
+}
+
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
@@ -270,6 +277,7 @@ all() {
   # set_up_aws
   # stow_dotfiles
   # set_up_vscode
+  # install_fargate_cli
   printf "\n✨  Done!\n"
   printf "(don't forget to launch docker desktop for the first time)\n"
 }

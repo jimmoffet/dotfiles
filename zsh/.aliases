@@ -44,6 +44,7 @@ dot() {
           "set_up_aws"
           "stow_dotfiles"
           "set_up_vscode"
+          "install_fargate_cli"
       )
       for i in "${funcs[@]}"; do
           printf "dot $i\n"
