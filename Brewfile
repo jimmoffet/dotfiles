@@ -1,3 +1,4 @@
+tap "hashicorp/tap"
 tap "homebrew/cask-fonts"
 tap "homebrew/bundle"
 tap "homebrew/cask"
@@ -58,6 +59,7 @@ brew "zplug"
 brew "zsh"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
+brew "hashicorp/tap/terraform"
 
 cask "airpass"
 cask "boop"
