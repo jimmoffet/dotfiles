@@ -282,6 +282,8 @@ all() {
   printf "(don't forget to launch docker desktop for the first time)\n"
 }
 
+# more CLI tools https://dev.to/lissy93/cli-tools-you-cant-live-without-57f6
+
 if [[ "$@" = "" ]]; then
     printf "Let's run it all!\n"
     all
