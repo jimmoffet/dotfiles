@@ -487,6 +487,8 @@ loadenv() {
 
 alias activate='source venv/bin/activate'
 
+alias cfl='cf login -a api.fr.cloud.gov --sso'
+
 venv() {
 	source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
 }
