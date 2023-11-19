@@ -49,7 +49,6 @@
   "zenMode.centerLayout": false,
   "zenMode.fullScreen": false,
   "zenMode.restore": true,
-  "workbench.activityBar.visible": false,
   "search.mode": "newEditor",
   // "workbench.colorCustomizations": {
   //   "editorWarning.foreground": "#ffff00", // Warnings inside the file
@@ -58,5 +57,6 @@
   //   "list.errorForeground": "#f66", // Errors on the file name
   // },
   "git.decorations.enabled": true,
-  "editor.stickyScroll.enabled": true
+  "editor.stickyScroll.enabled": true,
+  "workbench.activityBar.location": "hidden"
 }

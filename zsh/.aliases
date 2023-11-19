@@ -75,6 +75,24 @@ findin() {
   echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
 }
 
+findprocess() {
+	ps ax|grep $@
+  echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
+}
+
+killallprocesses() {
+	pkill -f $@
+  echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
+}
+
+zscaleroff() {
+	sudo launchctl unload /Library/LaunchDaemons/com.zscaler.service.plist /Library/LaunchDaemons/com.zscaler.tunnel.plist
+}
+
+zscaleron() {
+	sudo launchctl load /Library/LaunchDaemons/com.zscaler.service.plist /Library/LaunchDaemons/com.zscaler.tunnel.plist
+}
+
 # git
 alias g="git"
 
@@ -330,6 +348,7 @@ alias dotfiles="cd ~/dotfiles"
 
 # python
 alias pip="pip3"
+alias python="python3"
 
 # make a pdf
 alias mergepdf="/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py"
@@ -475,6 +494,7 @@ pyenv() {
 }
 
 # Loads `.env` file from a filename passed as an argument
+# TODO allow empty arg and use ".env"
 loadenv() {
   while read line; do
     if [ "${line:0:1}" = '#' ]; then
@@ -485,18 +505,18 @@ loadenv() {
   echo 'Loaded!'
 }
 
-alias activate='source venv/bin/activate'
+alias activate='source .venv/bin/activate'
 
 alias cfl='cf login -a api.fr.cloud.gov --sso'
 
 venv() {
-	source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
+	source .venv/bin/activate &> /dev/null || python -m venv .venv && source .venv/bin/activate
 }
 
 # Sets up all my working env
 workon() {
   if _z 2>&1 "$1"; then
-    source 'venv/bin/activate' || true  # There might be no `.venv`
+    source '.venv/bin/activate' || true  # There might be no `.venv`
     code .
   fi
 }
