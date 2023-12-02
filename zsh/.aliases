@@ -127,7 +127,11 @@ alias gbnm="git branch --no-merged"
 alias gchp="git cherry-pick"
 
 # clone
-alias gcl="git clone"
+gcl() {
+  repo_name=${$(basename "$1")%.git}
+  git clone "$1" "$repo_name"
+  code "$repo_name"
+}
 
 # commit
 alias gcm="git commit -m"
@@ -498,7 +502,7 @@ venv() {
 # Sets up all my working env
 workon() {
   if _z 2>&1 "$1"; then
-    source '.venv/bin/activate' || true  # There might be no `venv`
+    source 'venv/bin/activate' || true  # There might be no `venv`
     code .
   fi
 }
