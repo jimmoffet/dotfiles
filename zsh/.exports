@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+# export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
@@ -19,9 +19,18 @@ export LANG="en_US"
 # https://stackoverflow.com/a/42265848/96656
 export GPG_TTY=$(tty)
 
-# configure ruby
-source $mybrewpackages/chruby/chruby.sh
-source $mybrewpackages/chruby/auto.sh
+# configure brew path and ruby
+if [[ $(uname -m) == 'arm64' ]]; then
+    mybrewpackages=/opt/homebrew/opt
+    source $mybrewpackages/chruby/share/chruby/chruby.sh
+    source $mybrewpackages/chruby/share/chruby/auto.sh
+fi
+if [[ $(uname -m) == 'x86_64' ]]; then
+    mybrewpackages=/usr/local/share
+    source $mybrewpackages/chruby/chruby.sh
+    source $mybrewpackages/chruby/auto.sh
+fi
+
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'

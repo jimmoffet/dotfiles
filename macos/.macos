@@ -102,6 +102,9 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 # defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 # defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
+# Touchbar: display legacy function keys
+# defaults write com.apple.touchbar.agent PresentationModeGlobal functionKeys
+
 # Trackpad: enable 3 finger drag
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
@@ -193,6 +196,9 @@ defaults write com.apple.screencapture location -string "${HOME}/Desktop/screens
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
+
+# Do not display the thumbnail when saving screenshots
+defaults write com.apple.screencapture "show-thumbnail" -bool "false"
 
 # Enable subpixel font rendering on non-Apple LCDs
 # Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
@@ -416,6 +422,9 @@ defaults write com.apple.terminal StringEncodings -array 4
 # See: https://security.stackexchange.com/a/47786/8918
 defaults write com.apple.terminal SecureKeyboardEntry -bool true
 
+# Enable Touch id in Terminal.app
+defaults write com.apple.security.authorization ignoreArd -bool TRUE
+
 # Disable the annoying line marks
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
@@ -543,6 +552,8 @@ for app in "Activity Monitor" \
 	"Finder" \
 	"Google Chrome" \
 	"Messages" \
+	"Touch Bar agent" \
+	"ControlStrip" \
 	"SystemUIServer"; do
 	killall "${app}" &> /dev/null
 done

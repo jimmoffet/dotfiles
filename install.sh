@@ -1,5 +1,17 @@
 #!/bin/bash
 
+printf "DETECTING HARDWARE...\n"
+if [[ $(uname -m) == 'arm64' ]]; then
+    printf "Found Apple silicon\n"
+    mybrewpath=/opt/homebrew/bin/brew
+    mybrewpackages=/opt/homebrew/opt
+fi
+if [[ $(uname -m) == 'x86_64' ]]; then
+    printf "Found Intel silicon\n"
+    mybrewpath=/usr/local/Homebrew/bin/brew
+    mybrewpackages=/usr/local/share
+fi
+
 create_dirs() {
     printf "\n🗄  Creating directories\n"
     declare -a dirs=(
@@ -10,7 +22,9 @@ create_dirs() {
     for i in "${dirs[@]}"; do
         mkdir "$i"
     done
+    sudo chown -R "$USER":admin /usr/local
     sudo chown -R "$USER":admin /usr/local/*
+    sudo chown -R "$USER":admin $HOME
 }
 
 build_xcode() {
@@ -49,6 +63,12 @@ install_brew() {
     brew bundle
     brew link --overwrite cocoapods
     sudo -v
+}
+
+wipe_finder_prefs() {
+  # Destroy existing finder preferences for all folders
+  sudo find / -name ".DS_Store"  -exec rm {} \;
+  sudo -v
 }
 
 mac_defaults_write() {
@@ -168,9 +188,8 @@ set_startup_scripts() {
     printf "\n🎬 Set up startup scripts\n"
     sudo chmod a+x $HOME/dotfiles/startup/setuptouchid.sh
     sudo ln -s $HOME/dotfiles/startup/setuptouchid.sh $HOME/Desktop/setuptouchid.sh
-    # sudo cp $HOME/dotfiles/startup/com.setuptouchid.plist /Library/LaunchDaemons/com.setuptouchid.plist
+    $HOME/dotfiles/startup/setuptouchid.sh
 
-    printf "\n🎬 Set up startup scripts\n"
     sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-downloads.sh
     sudo cp $HOME/dotfiles/startup/remove-quarantine-downloads.sh $HOME/remove-quarantine-downloads.sh
     sudo chmod 755 $HOME/dotfiles/startup/remove-quarantine-documents.sh
@@ -184,6 +203,11 @@ set_startup_scripts() {
     watchman -- trigger ~/Documents removequarantine '*' -- ~/remove-quarantine-documents.sh
     # sudo watchman watch Applications
     # sudo watchman -- trigger Applications removequarantine '*' -- ~/remove-quarantine-applications.sh
+}
+
+set_up_aws() {
+    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    sudo installer -pkg AWSCLIV2.pkg -target /
 }
 
 set_up_vscode() {
@@ -227,33 +251,42 @@ set_up_vscode() {
 
 }
 
-set_up_aws() {
-    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-    sudo installer -pkg AWSCLIV2.pkg -target /
+install_fargate_cli() {
+    printf "\n🐳  Install fargate cli\n"
+    curl -LO https://github.com/awslabs/fargatecli/releases/download/0.3.2/fargate-0.3.2-darwin-amd64.zip
+    unzip fargate-0.3.2-darwin-amd64.zip
+    mv fargate /usr/local/bin
 }
-
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
 ## Ask for admin password if not within timeout, else restart timeout clock
 sudo -v
 
-## RUN THE THINGS
-# create_dirs
-# build_xcode
-# install_brew
-# mac_defaults_write
-# install_docker
-# configure_ruby
-# configure_node
-# configure_python
-# configure_vim
-# set_startup_scripts
-# set_up_aws
-# stow_dotfiles
-# set_up_vscode
+## RUN ALL THE THINGS
+all() {
+  # create_dirs
+  # build_xcode
+  # install_brew
+  # mac_defaults_write
+  # wipe_finder_prefs
+  # install_docker
+  # configure_ruby
+  # configure_node
+  # configure_python
+  # configure_vim
+  # set_startup_scripts
+  # set_up_aws
+  # stow_dotfiles
+  # set_up_vscode
+  # install_fargate_cli
+  printf "\n✨  Done!\n"
+  printf "(don't forget to launch docker desktop for the first time)\n"
+}
 
+# more CLI tools https://dev.to/lissy93/cli-tools-you-cant-live-without-57f6
 
-printf "\n✨  Done!\n"
-printf "(don't forget to launch docker desktop for the first time)\n"
+if [[ "$@" = "" ]]; then
+    printf "Let's run it all!\n"
+    all
+fi
 
 "$@"
