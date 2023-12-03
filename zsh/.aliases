@@ -496,7 +496,7 @@ loadenv() {
 alias activate='source venv/bin/activate'
 
 venv() {
-	source .venv/bin/activate &> /dev/null || python -m venv .venv && source .venv/bin/activate
+	source venv/bin/activate &> /dev/null || python -m venv venv && source venv/bin/activate
 }
 
 # Sets up all my working env
