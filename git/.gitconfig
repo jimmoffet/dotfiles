@@ -17,6 +17,7 @@
   colorMoved = zebra
 [push]
   default = current
+	autoSetupRemote = true
 [commit]
   verbose = true
   # template = ~/.gitmessage

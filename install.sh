@@ -253,6 +253,7 @@ sudo -v
 # stow_dotfiles
 # set_up_vscode
 
+#test
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"
