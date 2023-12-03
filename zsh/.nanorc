@@ -22,4 +22,5 @@ set historylog
 # it is not useful:
 # set linenumbers
 
-include /usr/local/share/nano/*.nanorc
+#include /usr/local/share/nano/*.nanorc
+include /opt/homebrew/Cellar/nano/7.2/share/doc/nano/*.nanorc
