@@ -253,7 +253,7 @@ sudo -v
 # stow_dotfiles
 # set_up_vscode
 
-#test
+# set up detect secrets githook: https://sher-chowdhury.medium.com/improve-your-development-workflow-using-git-hooks-5bca3c2c6cf3
 
 printf "\n✨  Done!\n"
 printf "(don't forget to launch docker desktop for the first time)\n"

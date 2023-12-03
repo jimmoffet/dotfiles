@@ -3,7 +3,6 @@
 # or here: https://www.nano-editor.org/dist/v3/nanorc.5.html
 
 # Editor:
-
 set tabstospaces
 set trimblanks
 
