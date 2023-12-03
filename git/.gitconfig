@@ -5,6 +5,7 @@
   excludesfile = ~/.gitignore
   ignorecase = false
   abbrev = 12
+  hooksPath = /Users/jamesdmoffet/.global-git-hooks
 [alias]
   l  = log --graph --oneline --decorate
   ld = log --graph --pretty=format:'%C(yellow)%h%C(bold white red)%d%Creset %s %C(bold green)%cr %Creset%C(white)%an' --abbrev-commit --date=relative
