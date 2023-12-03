@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+alias code="code-insiders"
 
 # export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
@@ -126,7 +127,11 @@ alias gbnm="git branch --no-merged"
 alias gchp="git cherry-pick"
 
 # clone
-alias gcl="git clone"
+gcl() {
+  repo_name=${$(basename "$1")%.git}
+  git clone "$1" "$repo_name"
+  code "$repo_name"
+}
 
 # commit
 alias gcm="git commit -m"
