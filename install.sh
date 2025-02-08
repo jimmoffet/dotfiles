@@ -17,16 +17,16 @@ create_dirs() {
 
 build_xcode() {
     printf "\n🛠  Installing Xcode Command Line Tools\n"
-    if ! xcode-select --print-path &> /dev/null; then
+    if ! xcode-select --print-path &>/dev/null; then
         printf "XCODE NOT FOUND..."
-        xcode-select --install &> /dev/null
-        until xcode-select --print-path &> /dev/null; do
+        xcode-select --install &>/dev/null
+        until xcode-select --print-path &>/dev/null; do
             sleep 5
         done
         sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
         sudo xcodebuild -license
     fi
-    if xcode-select --print-path &> /dev/null; then
+    if xcode-select --print-path &>/dev/null; then
         printf "XCODE HAS BEEN FOUND..."
     fi
     sudo -v
@@ -34,7 +34,7 @@ build_xcode() {
 
 install_brew() {
     printf "\n🍺  Installing Homebrew packages\n"
-    if ! command -v "brew" &> /dev/null; then
+    if ! command -v "brew" &>/dev/null; then
         printf "Homebrew not found, installing."
         # install homebrew
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -61,7 +61,7 @@ mac_defaults_write() {
 
 install_docker() {
     printf "\n🐳  Installing Docker\n"
-    if ! command -v "docker" &> /dev/null; then
+    if ! command -v "docker" &>/dev/null; then
         printf "DOCKER NOT FOUND..."
         if [[ $(uname -m) == 'arm64' ]]; then
             printf "Downloading docker for arm64..."
@@ -89,7 +89,7 @@ configure_ruby() {
     source $mybrewpackages/chruby/auto.sh
     chruby ruby-2.7.4
     # disable downloading documentation
-    echo "gem: --no-document" >> ~/.gemrc
+    echo "gem: --no-document" >>~/.gemrc
     gem update --system
     gem install bundler
     # configure bundler to take advantage of cores
@@ -151,19 +151,22 @@ stow_dotfiles() {
 
 set_up_touchid() {
     printf "\n☝️  Set up Touch ID\n"
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-        then
-            printf "\nTouch ID is set up for sudo!\n"
-        else
-            printf "\nTouch ID is not set up for sudo, setting it up now...\n"
-            grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
-    fi
-    if grep -q "pam_tid.so" "/etc/pam.d/sudo";
-        then
+    if grep -q "pam_tid.so" "/etc/pam.d/sudo_local"; then
+        printf "\nTouch ID is already set up for sudo!\n"
+    else
+        printf "\nTouch ID is not set up for sudo, setting it up now...\n"
+        # grep pam_tid /etc/pam.d/sudo >/dev/null || echo auth sufficient pam_tid.so | cat - /etc/pam.d/sudo | sudo tee /etc/pam.d/sudo > /dev/null
+        sudo tee /etc/pam.d/sudo_local >/dev/null <<EOF
+auth       sufficient     pam_tid.so
+EOF
+
+        if grep -q "pam_tid.so" "/etc/pam.d/sudo_local"; then
             printf "\nTouch ID set up succeeded!\n"
         else
             printf "\nTouch ID set up failed!\n"
+        fi
     fi
+    printf "\n✨  Done!\n"
 }
 
 set_startup_scripts() {
@@ -233,10 +236,14 @@ set_up_aws() {
     sudo installer -pkg AWSCLIV2.pkg -target /
 }
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+finish() {
+    export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
 
-## Ask for admin password if not within timeout, else restart timeout clock
-sudo -v
+    ## Ask for admin password if not within timeout, else restart timeout clock
+    sudo -v
+    printf "\n✨  Done!\n"
+    printf "(don't forget to launch docker desktop for the first time)\n"
+}
 
 ## RUN THE THINGS
 # create_dirs
@@ -254,8 +261,5 @@ sudo -v
 # set_up_vscode
 
 # set up detect secrets githook: https://sher-chowdhury.medium.com/improve-your-development-workflow-using-git-hooks-5bca3c2c6cf3
-
-printf "\n✨  Done!\n"
-printf "(don't forget to launch docker desktop for the first time)\n"
 
 "$@"

@@ -22,5 +22,6 @@ set historylog
 # it is not useful:
 # set linenumbers
 
+# TODO: handle this env vars dynamic to personal v workbook
 #include /usr/local/share/nano/*.nanorc
 include /opt/homebrew/Cellar/nano/7.2/share/doc/nano/*.nanorc

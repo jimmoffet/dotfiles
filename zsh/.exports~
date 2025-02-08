@@ -44,7 +44,7 @@ export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
 # yarn
-# export PATH="$(yarn global bin):$PATH" # TODO: validate this
+export PATH="$(yarn global bin):$PATH" # TODO: validate this
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
