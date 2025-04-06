@@ -46,11 +46,12 @@ export PATH="$NPM_PACKAGES/bin:$PATH"
 # yarn
 # export PATH="$(yarn global bin):$PATH" # TODO: validate this
 
-# fzf
+# shellcheck source=$HOME/.fzf.zsh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --smart-case --glob "!.git/*" --glob "!node_modules/*"'
 
 # z
+# shellcheck source=$HOME/z.sh
 . ~/z.sh
 
 # depot tools
