@@ -1,5 +1,15 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="/usr/local/sbin:$PATH"
 export EDITOR=nano
+
+export NVM_DIR=~/.nvm
+if [ ! -d "$NVM_DIR" ]; then
+    mkdir -p "$NVM_DIR"
+fi
+
+[ -s "$(brew --prefix nvm)/nvm.sh" ] && . "$(brew --prefix nvm)/nvm.sh"
+[ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && . "$(brew --prefix nvm)/etc/bash_completion.d/nvm"
+
 
 # uncomment to run zprof
 # zmodload zsh/prof
