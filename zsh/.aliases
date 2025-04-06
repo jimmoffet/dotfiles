@@ -98,7 +98,7 @@ alias g="git"
 
 gitgo() {
 	git add .
-	git commit -m $1
+	auto commit $1
 	git push
 	echo "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}"
 }
