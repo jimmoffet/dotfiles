@@ -1,3 +1,4 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="/usr/local/sbin:$PATH"
 export EDITOR=nano
 
@@ -60,13 +61,16 @@ esac
 export PATH="$PATH:/Users/jamesdmoffet/.local/bin"
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+if [ ! -d "$NVM_DIR" ]; then
+    mkdir -p "$NVM_DIR"
+fi
+
+[ -s "$(brew --prefix nvm)/nvm.sh" ] && . "$(brew --prefix nvm)/nvm.sh"
+[ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && . "$(brew --prefix nvm)/etc/bash_completion.d/nvm"
 
 # Automatically use the Node.js version specified in .nvmrc
 if [ -f .nvmrc ]; then
   nvm use
 fi
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
 export PATH="$HOME/git-filter-repo:$PATH"

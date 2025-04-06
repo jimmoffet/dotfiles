@@ -12,10 +12,9 @@ PATH=/opt/homebrew/bin:/opt/homebrew/sbin:$PATH # this is for 2020 M1 macbook
 PATH=/opt/homebrew/opt:$PATH                    # this is for 2020 M1 macbook
 export PATH
 
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-
-export PATH=/Users/jamesdmoffet/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0/gems:$PATH
+# export PATH="$HOME/.rbenv/bin:$PATH"
+# eval "$(rbenv init -)"
+# export PATH=/Users/jamesdmoffet/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0/gems:$PATH
 
 # prefer US English & utf-8
 export LC_ALL="en_US.UTF-8"
@@ -28,8 +27,8 @@ export GPG_TTY=$(tty)
 # configure ruby
 # source $mybrewpackages/chruby/chruby.sh
 # source $mybrewpackages/chruby/auto.sh
-source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/chruby.sh
-source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/auto.sh
+# source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/chruby.sh
+# source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
