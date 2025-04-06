@@ -51,10 +51,30 @@
     "command": "-cursorWordEndRightSelect",
     "when": "textInputFocus"
   },
+  // {
+  //   "key": "shift+cmd+left",
+  //   "command": "cursorWordStartLeft",
+  //   "when": "textInputFocus"
+  // },
   {
     "key": "shift+cmd+left",
-    "command": "cursorWordStartLeft",
+    "command": "cursorHome",
     "when": "textInputFocus"
+  },
+  {
+    "key": "shift+cmd+right",
+    "command": "cursorEnd",
+    "when": "textInputFocus"
+  },
+  { 
+    "key": "shift+end", 
+    "command": "cursorEndSelect", 
+    "when": "editorTextFocus"
+  },
+  { 
+    "key": "shift+home", 
+    "command": "cursorHomeSelect", 
+    "when": "editorTextFocus"
   },
   {
     "key": "alt+left",
@@ -100,29 +120,29 @@
     "when": "editorTextFocus && jupyter.featureenabled && jupyter.ownsSelection && !findInputFocussed && !replaceInputFocussed && editorLangId == 'python'"
   },
   {
-    "key": "shift+enter",
+    "key": "shift+alt+enter",
     "command": "-python.execSelectionInTerminal",
     "when": "editorTextFocus && !findInputFocussed && !python.datascience.ownsSelection && !replaceInputFocussed && editorLangId == 'python'"
   },
-  {
-    "key": "cmd+l",
-    "command": "copyRelativeFilePath"
-  },
+  // {
+  //   "key": "cmd+l",
+  //   "command": "copyRelativeFilePath"
+  // },
   {
     "key": "shift+alt+cmd+c",
     "command": "-copyRelativeFilePath",
     "when": "!editorFocus"
   },
-  {
-    "key": "cmd+l",
-    "command": "-expandLineSelection",
-    "when": "editorFocus"
-  },
-  {
-    "key": "cmd+l",
-    "command": "-expandLineSelection",
-    "when": "textInputFocus"
-  },
+  // {
+  //   "key": "cmd+l",
+  //   "command": "-expandLineSelection",
+  //   "when": "editorFocus"
+  // },
+  // {
+  //   "key": "cmd+l",
+  //   "command": "-expandLineSelection",
+  //   "when": "textInputFocus"
+  // },
   {
     "key": "ctrl+p",
     "command": "-cursorUp",
@@ -133,10 +153,10 @@
     "command": "-cursorDown",
     "when": "textInputFocus"
   },
-  {
-    "key": "shift+cmd+r",
-    "command": "python.execSelectionInTerminal"
-  },
+  // {
+  //   "key": "shift+cmd+r",
+  //   "command": "python.execSelectionInTerminal"
+  // },
   {
     "key": "shift+cmd+r",
     "command": "-workbench.action.showAllSymbols"
@@ -186,7 +206,7 @@
     "when": "terminalFocus && terminalProcessSupported"
   },
   {
-    "key": "shift+enter",
+    "key": "shift+alt+enter",
     "command": "-python.execSelectionInTerminal",
     "when": "editorTextFocus && !findInputFocussed && !jupyter.ownsSelection && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
   },
@@ -292,5 +312,208 @@
     "key": "cmd+o",
     "command": "-workbench.action.files.openLocalFileFolder",
     "when": "remoteFileDialogVisible"
-  }
+  },
+  {
+    "key": "ctrl+s",
+    "command": "save-as-root.saveFile",
+    "when": "editorFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+1",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "workbench.action.closeAuxiliaryBar",
+          "macros.minimizeTerminalHeight",
+          "macros.terminalToSizeFour",
+          "workbench.action.terminal.resizePaneRight",
+        ],
+    },
+  },
+  {
+    "key": "cmd+2",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "workbench.action.closePanel",
+          "workbench.action.focusAuxiliaryBar",
+          "workbench.action.focusFirstEditorGroup",
+          "macros.decreaseViewSizeTen",
+          "macros.decreaseViewSizeTen",
+          "macros.decreaseViewSizeTen",
+          "macros.increaseViewSizeTen",
+          "macros.increaseViewSizeFive",
+          "workbench.action.focusAuxiliaryBar",
+          "continue.continueGUIView.focus",
+          // "claude-dev.SidebarProvider.focus",
+        ],
+    },
+  },
+  {
+    "key": "cmd+3",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeAuxiliaryBar",
+          "macros.minimizeTerminalHeight",
+          "macros.terminalToSizeFour",
+          "macros.minimizeSideBarWidth",
+          "macros.sideBarToSizeTwo",
+        ],
+    },
+  },
+  {
+    "key": "cmd+4",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "workbench.action.closePanel",
+          "workbench.action.focusAuxiliaryBar",
+          "workbench.action.focusFirstEditorGroup",
+          "macros.decreaseViewSizeTen",
+          "macros.decreaseViewSizeTen",
+          "macros.decreaseViewSizeTen",
+          "macros.increaseViewSizeTen",
+          "macros.increaseViewSizeFive",
+          "workbench.action.focusAuxiliaryBar",
+          // "continue.continueGUIView.focus",
+          "claude-dev.SidebarProvider.focus",
+        ],
+    },
+  },
+  {
+    "key": "cmd+5",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "workbench.action.closePanel",
+          "workbench.action.closeAuxiliaryBar",
+          "workbench.action.focusFirstEditorGroup",
+          "workbench.action.evenEditorWidths",
+        ],
+    },
+    "when": "multipleEditorGroups"
+  },
+  {
+    "key": "cmd+5",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "workbench.action.closePanel",
+          "workbench.action.closeAuxiliaryBar",
+          "workbench.action.focusFirstEditorGroup",
+          "macros.increaseViewSizeTen",
+          "macros.increaseViewSizeTen",
+          "macros.increaseViewSizeTen",
+          "macros.increaseViewSizeTen",
+          "workbench.action.toggleCenteredLayout",
+          "workbench.action.focusFirstEditorGroup",
+        ],
+    },
+    "when": "!multipleEditorGroups"
+  },
+  // {
+  //   "key": "cmd+5",
+  //   "command": "runCommands",
+  //   "args": {
+  //       "commands": [
+  //         "workbench.action.closeSidebar",
+  //         "workbench.action.closePanel",
+  //         "workbench.action.closeAuxiliaryBar",
+  //         "workbench.action.focusFirstEditorGroup",
+  //         "macros.increaseViewSizeTen",
+  //         "macros.increaseViewSizeTen",
+  //         "macros.increaseViewSizeTen",
+  //         "macros.increaseViewSizeTen",
+  //         "workbench.action.focusFirstEditorGroup",
+  //       ],
+  //       "when": "isCenteredLayout && !multipleEditorGroups"
+  //   },
+  // },
+  // ensure editor and sidebar are default sizes when opening/closing sidebar
+  {
+    "key": "cmd+B",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "macros.sideBarToSizeTwo",
+          "macros.editorToSizeFourteen",
+          "macros.sideBarToSizeTwo", // necessary in some cases
+        ],
+    },
+    "when": "!sideBarVisible"
+  },
+  // ensure editor and sidebar are default sizes when opening/closing sidebar
+  {
+    "key": "cmd+B",
+    "command": "runCommands",
+    "args": {
+        "commands": [
+          "workbench.action.closeSidebar",
+          "macros.editorToSizeFourteen",
+        ],
+    },
+    "when": "sideBarVisible"
+  },
+  {
+    "key": "shift+alt+cmd+d",
+    "command": "workbench.view.debug",
+    "when": "viewContainer.workbench.view.debug.enabled"
+  },
+  {
+    "key": "shift+cmd+d",
+    "command": "-workbench.view.debug",
+    "when": "viewContainer.workbench.view.debug.enabled"
+  },
+  {
+    "key": "shift+cmd+d",
+    "command": "editor.action.selectHighlights",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+cmd+f",
+    "command": "-editor.action.selectHighlights",
+    "when": "editorFocus"
+  },
+  {
+    "key": "cmd+j",
+    "command": "workbench.action.terminal.focus",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "cmd+alt+j",
+    "command": "workbench.action.toggleMaximizedPanel",
+    "when": "terminalFocus"
+  },
+  // {
+  //   "key": "cmd+alt+j",
+  //   "command": "workbench.action.togglePanel"
+  // },
+  {
+    "key": "cmd+j",
+    "command": "-workbench.action.togglePanel",
+    "when": "panelVisible"
+  },
+  {
+    "key": "cmd+alt+p", // or any other key combination you prefer
+    "command": "workbench.actions.view.problems"
+  },
+  {
+    "key": "cmd+alt+p", // or any other key combination you prefer
+    "command": "-workbench.actions.view.problems",
+    "when": "panelVisible"
+  },
+  // {
+  //   "key": "cmd+2",
+  //   "command": "-workbench.action.focusSecondEditorGroup"
+  // },
+  // on cmd+alt+B, if sidebarvisible and !auxbarvisible, close panel and resize auxbar
+  // on cmd+alt+B, if sidebarvisible and auxbarvisible and panelvisible, close auxbar and resize editor14
+  // on cmd+alt+B, if sidebarvisible and auxbarvisible and !panelvisible, close auxbar and resize editor14
+  // on cmd+J, do the opposite of above
 ]
