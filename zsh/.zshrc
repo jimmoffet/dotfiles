@@ -11,7 +11,14 @@ plugins=(
   poetry
   dotenv
   zsh-github-copilot
+  # kollzsh
 )
+
+# KOLLZSH_MODEL="hhao/qwen2.5-coder-tools:3b"
+# KOLLZSH_HOTKEY="^o"
+# KOLLZSH_COMMAND_COUNT=5
+# KOLLZSH_URL="http://localhost:11434"
+# KOLLZSH_KEEP_ALIVE="1h"
 
 # history
 HISTSIZE=50000
@@ -74,3 +81,7 @@ if [ -f .nvmrc ]; then
 fi
 
 export PATH="$HOME/git-filter-repo:$PATH"
+
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"

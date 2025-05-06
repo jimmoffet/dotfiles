@@ -1,5 +1,5 @@
 {
-  "editor.cursorSmoothCaretAnimation": false,
+  "editor.cursorSmoothCaretAnimation": "off",
   "editor.fontSize": 13,
   "editor.fontFamily": "Hack Nerd Font",
   "editor.fontLigatures": true,
@@ -12,6 +12,7 @@
   "editor.tabCompletion": "on",
   "editor.wordWrap": "wordWrapColumn",
   "editor.wordWrapColumn": 120,
+  "editor.minimap.enabled": false,
   "eslint.defaultFormatter": "esbenp.prettier-vscode",
   "eslint.format.enable": true,
   "eslint.packageManager": "yarn",
@@ -33,7 +34,8 @@
     "*.pyi": "python",
     "*.bats": "shellscript",
     "*.sh": "shellscript",
-    "*.nanorc": "shellscript"
+    "*.nanorc": "shellscript",
+    ".env*": "dotenv"
   },
   "javascript.updateImportsOnFileMove.enabled": "always",
   "material-icon-theme.folders.theme": "specific",
@@ -51,7 +53,6 @@
   "zenMode.centerLayout": false,
   "zenMode.fullScreen": false,
   "zenMode.restore": true,
-  "workbench.activityBar.visible": false,
   "search.mode": "newEditor",
   // "workbench.colorCustomizations": {
   //   "editorWarning.foreground": "#ffff00", // Warnings inside the file
@@ -60,5 +61,37 @@
   //   "list.errorForeground": "#f66", // Errors on the file name
   // },
   "git.decorations.enabled": true,
-  "editor.experimental.stickyScroll.enabled": true
+  "terminal.integrated.fontFamily": "monospace",
+  "editor.tokenColorCustomizations": {
+    "[*Light*]": {
+      "textMateRules": [
+        {
+          "scope": "ref.matchtext",
+          "settings": {
+            "foreground": "#000"
+          }
+        }
+      ]
+    },
+    "[*Dark*]": {
+      "textMateRules": [
+        {
+          "scope": "ref.matchtext",
+          "settings": {
+            "foreground": "#fff"
+          }
+        }
+      ]
+    },
+    "textMateRules": [
+      {
+        "scope": "keyword.other.dotenv",
+        "settings": {
+          "foreground": "#FF000000"
+        }
+      }
+    ]
+  },
+  "workbench.activityBar.location": "hidden",
+  "editor.stickyScroll.enabled": true
 }
