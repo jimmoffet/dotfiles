@@ -133,14 +133,32 @@ gitgo() {
 	
 	# Generate commit message
 	if [ "$use_ai" = true ]; then
-		commit_msg=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>/dev/null)
-		if [ $? -ne 0 ]; then
-			# Fallback to user message or prompt for one
-			if [ -n "$user_msg" ]; then
-				commit_msg="$user_msg"
+		# Capture both stdout and stderr to detect specific failures
+		ai_output=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>&1)
+		ai_exit_code=$?
+		
+		if [ $ai_exit_code -eq 0 ]; then
+			commit_msg="$ai_output"
+		else
+			# Check if it's an API key issue
+			if echo "$ai_output" | grep -q "OPENAI_API_KEY not found"; then
+				printf "\n\e[91m❌ OpenAI API key not found!\e[0m\n"
+				printf "\e[94mTo use AI-powered commit messages, set up your API key:\e[0m\n"
+				printf "  1. Get an API key from: https://platform.openai.com/api-keys\n"
+				printf "  2. Store it securely: \e[93mset_openai_key <your-key>\e[0m\n"
+				printf "  3. Or bypass AI: \e[93mgitgo --no-ai 'your message'\e[0m\n\n"
+				return 1
 			else
-				printf "AI commit generation failed. Enter commit message: "
-				read -r commit_msg
+				# Other AI failures - show the error and prompt for manual input
+				printf "\n\e[93m⚠️  AI commit generation failed:\e[0m\n"
+				printf "%s\n" "$ai_output"
+				if [ -n "$user_msg" ]; then
+					commit_msg="$user_msg"
+					printf "Using your original message: \e[94m%s\e[0m\n" "$user_msg"
+				else
+					printf "Enter commit message: "
+					read -r commit_msg
+				fi
 			fi
 		fi
 	else
