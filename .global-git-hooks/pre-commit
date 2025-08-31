@@ -25,3 +25,4 @@ fi
 
 # Run ggshield secret scan
 ggshield secret scan pre-commit "$@"
+ggshield quota
