@@ -1,11 +1,14 @@
 #!/bin/bash
 
+#TODO: set up uv venv in dotfiles workspace with preferred python version and pip install openai 
+
 printf "DETECTING HARDWARE...\n"
 if [[ $(uname -m) == 'arm64' ]]; then
     printf "Found Apple silicon\n"
     mybrewpath=/opt/homebrew/bin/brew
     mybrewpackages=/opt/homebrew/opt
 fi
+
 # if [[ $(uname -m) == 'x86_64' ]]; then
 #     printf "Found Intel silicon\n"
 #     mybrewpath=/usr/local/Homebrew/bin/brew
@@ -249,7 +252,7 @@ stow_dotfiles() {
     # Remove existing global git hooks if they exist
     rm -f ~/.global-git-hooks/pre-commit
     # stow colorls fzf git nvim yabai skhd starship tmux vim z zsh
-    stow colorls fzf git nvim starship tmux vim z zsh .global-git-hooks
+    stow colorls fzf git nvim starship tmux vim z zsh .global-git-hooks scripts
     sudo -v
 }
 

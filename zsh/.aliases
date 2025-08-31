@@ -97,13 +97,48 @@ zon() {
 alias g="git"
 
 gitgo() {
+	local user_msg="$1"
+	local commit_msg
+	local use_ai=true
+	
+	# Check for --no-ai flag
+	if [ "$1" = "--no-ai" ]; then
+		use_ai=false
+		user_msg="$2"
+	fi
+	
 	git add .
-	if ! git commit -m "$1"; then
-		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}\n"
+	
+	# Generate commit message
+	if [ "$use_ai" = true ]; then
+		commit_msg=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>/dev/null)
+		if [ $? -ne 0 ]; then
+			# Fallback to user message or prompt for one
+			if [ -n "$user_msg" ]; then
+				commit_msg="$user_msg"
+			else
+				printf "AI commit generation failed. Enter commit message: "
+				read -r commit_msg
+			fi
+		fi
+	else
+		commit_msg="$user_msg"
+	fi
+	
+	# Ensure we have a commit message
+	if [ -z "$commit_msg" ]; then
+		printf "Enter commit message: "
+		read -r commit_msg
+	fi
+	
+	if ! git commit -m "$commit_msg"; then
+		printf "\n\e[94mCommit failed, aborting push\e[0m\n"
 		return 1
 	fi
+	
 	git push
-	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}\n"
+	printf "\n\e[94mTip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'\e[0m\n"
+	#TODO: detect all TODO lines in current branch and print them at end of function
 }
 
 # one letter aliases w/o options
