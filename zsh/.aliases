@@ -144,26 +144,11 @@ gitgo() {
 		if [ $ai_exit_code -eq 0 ]; then
 			commit_msg="$ai_output"
 		else
-			# Check if it's an API key issue
-			if echo "$ai_output" | grep -q "OPENAI_API_KEY not found"; then
-				echo -e "\n${RED}❌ OpenAI API key not found!${ENDCOLOR}"
-				echo -e "${LIGHTBLUE}To use AI-powered commit messages, set up your API key:${ENDCOLOR}"
-				echo "  1. Get an API key from: https://platform.openai.com/api-keys"
-				echo -e "  2. Store it securely: ${YELLOW}set_openai_key <your-key>${ENDCOLOR}"
-				echo -e "  3. Or bypass AI: ${YELLOW}gitgo --no-ai 'your message'${ENDCOLOR}\n"
-				return 1
-			else
-				# Other AI failures - show the error and prompt for manual input
-				echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
-				echo "$ai_output"
-				if [ -n "$user_msg" ]; then
-					commit_msg="$user_msg"
-					echo -e "Using your original message: ${LIGHTBLUE}$user_msg${ENDCOLOR}"
-				else
-					echo "Enter commit message: "
-					read -r commit_msg
-				fi
-			fi
+			# AI failed - show error and exit
+			echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+			echo "$ai_output"
+			echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}gitgo --no-ai 'your message'${ENDCOLOR}"
+			return 1
 		fi
 	else
 		commit_msg="$user_msg"
