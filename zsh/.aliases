@@ -53,6 +53,10 @@ dot() {
 
 LIGHTBLUE="\e[94m"
 ENDCOLOR="\e[0m"
+GREEN="\e[92m"
+CYAN="\e[96m"
+YELLOW="\e[93m"
+RED="\e[91m"
 
 # find stuff
 findall() {
@@ -96,22 +100,22 @@ zon() {
 # OpenAI API Key management
 set_openai_key() {
 	if [ -z "$1" ]; then
-		printf "Usage: set_openai_key <api-key>\n"
-		printf "This will securely store your OpenAI API key in macOS Keychain\n"
+		echo "Usage: set_openai_key <api-key>"
+		echo "This will securely store your OpenAI API key in macOS Keychain"
 		return 1
 	fi
 	security add-generic-password -a "$USER" -s "openai-api-key" -w "$1" -U
-	printf "OpenAI API key stored securely in Keychain\n"
+	echo "OpenAI API key stored securely in Keychain"
 }
 
 check_openai_key() {
 	local key
 	key=$(security find-generic-password -a "$USER" -s "openai-api-key" -w 2>/dev/null)
 	if [ $? -eq 0 ] && [ -n "$key" ]; then
-		printf "OpenAI API key found in Keychain (first 10 chars: ${key:0:10}...)\n"
+		echo -e "OpenAI API key found in Keychain (first 10 chars: ${YELLOW}${key:0:10}...${ENDCOLOR})"
 	else
-		printf "No OpenAI API key found in Keychain\n"
-		printf "Use 'set_openai_key <your-key>' to store it securely\n"
+		echo "No OpenAI API key found in Keychain"
+		echo -e "Use '${YELLOW}set_openai_key <your-key>${ENDCOLOR}' to store it securely"
 	fi
 }
 
@@ -142,21 +146,21 @@ gitgo() {
 		else
 			# Check if it's an API key issue
 			if echo "$ai_output" | grep -q "OPENAI_API_KEY not found"; then
-				printf "\n\e[91m❌ OpenAI API key not found!\e[0m\n"
-				printf "\e[94mTo use AI-powered commit messages, set up your API key:\e[0m\n"
-				printf "  1. Get an API key from: https://platform.openai.com/api-keys\n"
-				printf "  2. Store it securely: \e[93mset_openai_key <your-key>\e[0m\n"
-				printf "  3. Or bypass AI: \e[93mgitgo --no-ai 'your message'\e[0m\n\n"
+				echo -e "\n${RED}❌ OpenAI API key not found!${ENDCOLOR}"
+				echo -e "${LIGHTBLUE}To use AI-powered commit messages, set up your API key:${ENDCOLOR}"
+				echo "  1. Get an API key from: https://platform.openai.com/api-keys"
+				echo -e "  2. Store it securely: ${YELLOW}set_openai_key <your-key>${ENDCOLOR}"
+				echo -e "  3. Or bypass AI: ${YELLOW}gitgo --no-ai 'your message'${ENDCOLOR}\n"
 				return 1
 			else
 				# Other AI failures - show the error and prompt for manual input
-				printf "\n\e[93m⚠️  AI commit generation failed:\e[0m\n"
-				printf "%s\n" "$ai_output"
+				echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+				echo "$ai_output"
 				if [ -n "$user_msg" ]; then
 					commit_msg="$user_msg"
-					printf "Using your original message: \e[94m%s\e[0m\n" "$user_msg"
+					echo -e "Using your original message: ${LIGHTBLUE}$user_msg${ENDCOLOR}"
 				else
-					printf "Enter commit message: "
+					echo "Enter commit message: "
 					read -r commit_msg
 				fi
 			fi
@@ -167,36 +171,36 @@ gitgo() {
 	
 	# Ensure we have a commit message
 	if [ -z "$commit_msg" ]; then
-		printf "Enter commit message: "
+		echo "Enter commit message: "
 		read -r commit_msg
 	fi
 	
 	if ! git commit -m "$commit_msg"; then
-		printf "\n\e[94mCommit failed, aborting push\e[0m\n"
+		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
 		return 1
 	fi
 	
 	git push
 	
 	# Display a nice summary
-	printf "\n\e[92m✅ Commit Summary\e[0m\n"
-	printf "\e[96m📝 Message:\e[0m %s\n" "$commit_msg"
+	echo -e "\n${GREEN}✅ Commit Summary${ENDCOLOR}"
+	echo -e "${CYAN}📝 Message:${ENDCOLOR} $commit_msg"
 	
 	# Get diff stats
 	local stats
 	stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
 	if [ -n "$stats" ]; then
-		printf "\e[96m📊 Changes:\e[0m\n"
+		echo -e "${CYAN}📊 Changes:${ENDCOLOR}"
 		echo "$stats" | while IFS= read -r line; do
 			if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
-				printf "    \e[93m%s\e[0m\n" "$line"
+				echo -e "    ${YELLOW}$line${ENDCOLOR}"
 			else
-				printf "    %s\n" "$line"
+				echo "    $line"
 			fi
 		done
 	fi
 	
-	printf "\n\e[94mTip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'\e[0m\n"
+	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'${ENDCOLOR}"
 	#TODO: detect all TODO lines in current branch and print them at end of function
 }
 

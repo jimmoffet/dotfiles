@@ -55,12 +55,12 @@ def generate_commit_message(user_message, git_diff):
     except ImportError:
         print("OpenAI SDK not available", file=sys.stderr)
         return None
-    
+
     api_key = get_openai_api_key()
     if not api_key:
         print("OPENAI_API_KEY not found", file=sys.stderr)
         return None
-    
+
     # Limit diff size to prevent expensive API calls
     max_diff_chars = 8000  # ~2000 tokens
     if len(git_diff) > max_diff_chars:
@@ -95,24 +95,24 @@ Git diff:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format when appropriate (e.g., 'feat:', 'fix:', 'docs:', etc.)."
+                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format when appropriate (e.g., 'feat:', 'fix:', 'docs:', etc.).",
                 },
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             response_format=CommitMessage,
             max_completion_tokens=300,
             temperature=0.3,
         )
-        
+
         # Parse the structured response
         commit_data = response.choices[0].message.parsed
         summary = commit_data.summary
         description = commit_data.description
-        
+
         # Check if summary is over 50 characters and warn
         if len(summary) > 50:
             print(f"Warning: Summary is {len(summary)} characters (recommended: ≤50)", file=sys.stderr)
-        
+
         # Reconstruct the commit message with proper formatting
         if description.strip():
             return f"{summary}\n\n{description}"
@@ -122,6 +122,8 @@ Git diff:
     except Exception as e:
         print(f"OpenAI API error: {e}", file=sys.stderr)
         return None
+
+
 def main():
     user_message = sys.argv[1] if len(sys.argv) > 1 else ""
 
