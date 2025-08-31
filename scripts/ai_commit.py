@@ -123,7 +123,7 @@ Git diff:
         # Handle specific OpenAI API errors
         try:
             from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError
-            
+
             if isinstance(e, AuthenticationError):
                 print(f"OpenAI API authentication error: {e}", file=sys.stderr)
             elif isinstance(e, RateLimitError):
@@ -137,7 +137,7 @@ Git diff:
         except ImportError:
             # If we can't import OpenAI error types, just show the general error
             print(f"OpenAI API error: {e}", file=sys.stderr)
-        
+
         return None
 
 
