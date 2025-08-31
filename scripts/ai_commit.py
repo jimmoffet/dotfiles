@@ -125,7 +125,46 @@ Git diff:
             from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError
 
             if isinstance(e, AuthenticationError):
-                print(f"OpenAI API authentication error: {e}", file=sys.stderr)
+                # Check if it's a 401 and retry once after delay
+                if "401" in str(e):
+                    print("API authentication issue detected, waiting 30 seconds and retrying...", file=sys.stderr)
+                    import time
+                    time.sleep(30)
+                    
+                    # Retry the API call once
+                    try:
+                        response = client.chat.completions.parse(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {
+                                    "role": "system",
+                                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format when appropriate (e.g., 'feat:', 'fix:', 'docs:', etc.).",
+                                },
+                                {"role": "user", "content": prompt},
+                            ],
+                            response_format=CommitMessage,
+                            max_completion_tokens=300,
+                            temperature=0.3,
+                        )
+                        
+                        # Parse the structured response
+                        commit_data = response.choices[0].message.parsed
+                        summary = commit_data.summary
+                        description = commit_data.description
+
+                        # Check if summary is over 50 characters and warn
+                        if len(summary) > 50:
+                            print(f"Warning: Summary is {len(summary)} characters (recommended: ≤50)", file=sys.stderr)
+
+                        # Reconstruct the commit message with proper formatting
+                        if description.strip():
+                            return f"{summary}\n\n{description}"
+                        else:
+                            return summary
+                    except Exception as retry_e:
+                        print(f"Retry failed - OpenAI API authentication error: {retry_e}", file=sys.stderr)
+                else:
+                    print(f"OpenAI API authentication error: {e}", file=sys.stderr)
             elif isinstance(e, RateLimitError):
                 print(f"OpenAI API rate limit exceeded: {e}", file=sys.stderr)
             elif isinstance(e, APIConnectionError):

@@ -169,7 +169,15 @@ gitgo() {
 	
 	# Display a nice summary
 	echo -e "\n${GREEN}✅ Commit Summary${ENDCOLOR}"
-	echo -e "${CYAN}📝 Message:${ENDCOLOR} $commit_msg"
+	echo -e "${CYAN}📝 Message:${ENDCOLOR}"
+	# Display commit message with proper multi-line formatting
+	echo "$commit_msg" | while IFS= read -r line; do
+		if [ -n "$line" ]; then
+			echo "    $line"
+		else
+			echo ""
+		fi
+	done
 	
 	# Get diff stats
 	local stats
