@@ -246,8 +246,10 @@ stow_dotfiles() {
     printf "\n🐗  Stow dotfiles\n"
     rm ~/.zshrc
     # rm ~/.gitconfig
+    # Remove existing global git hooks if they exist
+    rm -f ~/.global-git-hooks/pre-commit
     # stow colorls fzf git nvim yabai skhd starship tmux vim z zsh
-    stow colorls fzf git nvim starship tmux vim z zsh
+    stow colorls fzf git nvim starship tmux vim z zsh .global-git-hooks
     sudo -v
 }
 

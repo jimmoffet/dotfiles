@@ -7,4 +7,21 @@ if [ -f .git/hooks/pre-commit ]; then
     fi
 fi
 
+# Check if ggshield is installed, install if missing
+if ! command -v ggshield >/dev/null 2>&1; then
+    echo "ggshield not found, installing via brew..."
+    if command -v brew >/dev/null 2>&1; then
+        brew install ggshield
+        if ! command -v ggshield >/dev/null 2>&1; then
+            echo "Failed to install ggshield, skipping secret scan"
+            exit 1
+        fi
+    else
+        echo "Homebrew not found, cannot install ggshield automatically"
+        echo "Please install ggshield manually: brew install ggshield"
+        exit 1
+    fi
+fi
+
+# Run ggshield secret scan
 ggshield secret scan pre-commit "$@"

@@ -98,9 +98,12 @@ alias g="git"
 
 gitgo() {
 	git add .
-	git commit -m $1
+	if ! git commit -m "$1"; then
+		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}\n"
+		return 1
+	fi
 	git push
-	echo "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}"
+	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg'${ENDCOLOR}\n"
 }
 
 # one letter aliases w/o options
