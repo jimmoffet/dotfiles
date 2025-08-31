@@ -177,6 +177,25 @@ gitgo() {
 	fi
 	
 	git push
+	
+	# Display a nice summary
+	printf "\n\e[92m✅ Commit Summary\e[0m\n"
+	printf "\e[96m📝 Message:\e[0m %s\n" "$commit_msg"
+	
+	# Get diff stats
+	local stats
+	stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
+	if [ -n "$stats" ]; then
+		printf "\e[96m📊 Changes:\e[0m\n"
+		echo "$stats" | while IFS= read -r line; do
+			if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
+				printf "    \e[93m%s\e[0m\n" "$line"
+			else
+				printf "    %s\n" "$line"
+			fi
+		done
+	fi
+	
 	printf "\n\e[94mTip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'\e[0m\n"
 	#TODO: detect all TODO lines in current branch and print them at end of function
 }
