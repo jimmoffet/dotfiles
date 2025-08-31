@@ -93,6 +93,28 @@ zon() {
 	sudo launchctl load /Library/LaunchDaemons/com.zscaler.service.plist /Library/LaunchDaemons/com.zscaler.tunnel.plist
 }
 
+# OpenAI API Key management
+set_openai_key() {
+	if [ -z "$1" ]; then
+		printf "Usage: set_openai_key <api-key>\n"
+		printf "This will securely store your OpenAI API key in macOS Keychain\n"
+		return 1
+	fi
+	security add-generic-password -a "$USER" -s "openai-api-key" -w "$1" -U
+	printf "OpenAI API key stored securely in Keychain\n"
+}
+
+check_openai_key() {
+	local key
+	key=$(security find-generic-password -a "$USER" -s "openai-api-key" -w 2>/dev/null)
+	if [ $? -eq 0 ] && [ -n "$key" ]; then
+		printf "OpenAI API key found in Keychain (first 10 chars: ${key:0:10}...)\n"
+	else
+		printf "No OpenAI API key found in Keychain\n"
+		printf "Use 'set_openai_key <your-key>' to store it securely\n"
+	fi
+}
+
 # git
 alias g="git"
 

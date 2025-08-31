@@ -24,6 +24,26 @@ def estimate_tokens(text):
     """Rough token estimation (1 token ≈ 4 characters)"""
     return len(text) // 4
 
+def get_openai_api_key():
+    """Get OpenAI API key from Keychain or environment variable"""
+    # First try Keychain
+    try:
+        result = subprocess.run(
+            ['security', 'find-generic-password', '-a', os.getenv('USER'), '-s', 'openai-api-key', '-w'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        api_key = result.stdout.strip()
+        if api_key:
+            return api_key
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pass
+    
+    # Fallback to environment variable
+    return os.getenv('OPENAI_API_KEY')
+
+
 def generate_commit_message(user_message, git_diff):
     """Generate commit message using OpenAI API"""
     try:
@@ -32,7 +52,7 @@ def generate_commit_message(user_message, git_diff):
         print("OpenAI SDK not available", file=sys.stderr)
         return None
     
-    api_key = os.getenv('OPENAI_API_KEY')
+    api_key = get_openai_api_key()
     if not api_key:
         print("OPENAI_API_KEY not found", file=sys.stderr)
         return None
