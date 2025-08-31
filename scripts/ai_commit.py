@@ -120,7 +120,24 @@ Git diff:
             return summary
 
     except Exception as e:
-        print(f"OpenAI API error: {e}", file=sys.stderr)
+        # Handle specific OpenAI API errors
+        try:
+            from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError
+            
+            if isinstance(e, AuthenticationError):
+                print(f"OpenAI API authentication error: {e}", file=sys.stderr)
+            elif isinstance(e, RateLimitError):
+                print(f"OpenAI API rate limit exceeded: {e}", file=sys.stderr)
+            elif isinstance(e, APIConnectionError):
+                print(f"OpenAI API connection error: {e}", file=sys.stderr)
+            elif isinstance(e, APIError):
+                print(f"OpenAI API error: {e}", file=sys.stderr)
+            else:
+                print(f"Unexpected error: {e}", file=sys.stderr)
+        except ImportError:
+            # If we can't import OpenAI error types, just show the general error
+            print(f"OpenAI API error: {e}", file=sys.stderr)
+        
         return None
 
 
@@ -129,13 +146,13 @@ def main():
 
     # Check if we're in a git repository
     if not Path(".git").exists():
-        print("Not in a git repository", file=sys.stderr)
+        print("Error: Not in a git repository", file=sys.stderr)
         sys.exit(1)
 
     # Get staged changes
     git_diff = get_git_diff()
     if not git_diff:
-        print("No staged changes found", file=sys.stderr)
+        print("Error: No staged changes found", file=sys.stderr)
         sys.exit(1)
 
     # Generate commit message
@@ -145,9 +162,8 @@ def main():
         print(ai_message)
         sys.exit(0)
     else:
-        # Fallback to user message or default
-        fallback = user_message if user_message else "Update files"
-        print(fallback)
+        # AI failed, exit with error code to trigger fallback in gitgo
+        print("AI commit generation failed", file=sys.stderr)
         sys.exit(1)
 
 
