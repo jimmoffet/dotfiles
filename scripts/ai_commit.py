@@ -45,7 +45,15 @@ def get_openai_api_key():
     # First try Keychain
     try:
         result = subprocess.run(
-            ["security", "find-generic-password", "-a", os.getenv("USER"), "-s", "openai-api-key", "-w"],
+            [
+                "security",
+                "find-generic-password",
+                "-a",
+                os.getenv("USER"),
+                "-s",
+                "openai-api-key",
+                "-w",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -103,7 +111,7 @@ Git diff:
     try:
         # Use Chat Completions API with structured outputs
         response = client.chat.completions.parse(
-            model="gpt-4o-mini",
+            model="gpt-4.1-mini",
             messages=[
                 {
                     "role": "system",
@@ -126,10 +134,18 @@ Git diff:
                 total_tokens = getattr(usage, "total_tokens", "?")
                 # Details (may not exist for all models)
                 comp_details = getattr(usage, "completion_tokens_details", None)
-                reasoning_tokens = getattr(comp_details, "reasoning_tokens", None) if comp_details else None
+                reasoning_tokens = (
+                    getattr(comp_details, "reasoning_tokens", None)
+                    if comp_details
+                    else None
+                )
                 print(
                     f"[ai-usage] prompt={prompt_tokens} completion={completion_tokens} total={total_tokens}"
-                    + (f" reasoning={reasoning_tokens}" if reasoning_tokens is not None else ""),
+                    + (
+                        f" reasoning={reasoning_tokens}"
+                        if reasoning_tokens is not None
+                        else ""
+                    ),
                     file=sys.stderr,
                 )
 
@@ -149,7 +165,12 @@ Git diff:
     except Exception as e:
         # Handle specific OpenAI API errors
         try:
-            from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError
+            from openai import (
+                APIError,
+                APIConnectionError,
+                RateLimitError,
+                AuthenticationError,
+            )
 
             if isinstance(e, AuthenticationError):
                 print(f"OpenAI API authentication error: {e}", file=sys.stderr)
