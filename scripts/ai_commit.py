@@ -16,8 +16,20 @@ class CommitMessage(BaseModel):
 def get_git_diff():
     """Get the staged git diff"""
     try:
-        # Get staged changes
-        result = subprocess.run(["git", "diff", "--cached"], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            [
+                "git",
+                "diff",
+                "--cached",
+                "-U15",  # Show 15 lines of context instead of default 3
+                "--function-context",  # Show entire function context when possible
+                "--ignore-space-change",  # Ignore whitespace-only changes
+                "--no-color",  # Ensure no ANSI color codes
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return None
@@ -101,7 +113,7 @@ Git diff:
             ],
             response_format=CommitMessage,
             max_completion_tokens=600,
-            # temperature=0.3,
+            temperature=0.3,
         )
 
         # Optional usage diagnostics (export AI_COMMIT_USAGE=1 to enable)
