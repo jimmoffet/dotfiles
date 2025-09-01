@@ -155,8 +155,8 @@ display_commit_summary() {
 }
 
 gitgo() {
-	# Use commit() function to handle the commit part
-	if ! commit "$@"; then
+	# Use commit() function to handle the commit part (suppress summary)
+	if ! commit --from-gitgo "$@"; then
 		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
 		return 1
 	fi
@@ -178,6 +178,14 @@ commit() {
 	local user_msg="$1"
 	local commit_msg
 	local use_ai=true
+	local from_gitgo=false
+	
+	# Check for --from-gitgo flag (internal use)
+	if [ "$1" = "--from-gitgo" ]; then
+		from_gitgo=true
+		shift
+		user_msg="$1"
+	fi
 	
 	# Check for --no-ai flag
 	if [ "$1" = "--no-ai" ]; then
@@ -222,8 +230,10 @@ commit() {
 		return 1
 	fi
 	
-	# Display summary using the shared function
-	display_commit_summary "$commit_msg"
+	# Display summary only if not called from gitgo()
+	if [ "$from_gitgo" = false ]; then
+		display_commit_summary "$commit_msg"
+	fi
 	
 }
 
