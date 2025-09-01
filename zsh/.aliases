@@ -126,7 +126,7 @@ display_commit_summary() {
 	local commit_msg="$1"
 	
 	# Display a nice summary
-	echo -e "${CYAN}📝 Commit Message:${ENDCOLOR}"
+	echo -e "${CYAN}\n📝 Commit Message:${ENDCOLOR}"
 	printf "\n"
 	# Display commit message with proper multi-line formatting
 	echo "$commit_msg" | while IFS= read -r line; do
@@ -155,7 +155,6 @@ display_commit_summary() {
 }
 
 gitgo() {
-	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'${ENDCOLOR}"
 	# Use commit() function to handle the commit part
 	if ! commit "$@"; then
 		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
@@ -176,8 +175,6 @@ gitgo() {
 }
 
 commit() {
-	echo -e "\n${LIGHTBLUE}Tip: commit 'my commit msg' or commit --no-ai 'manual msg'${ENDCOLOR}"
-	
 	local user_msg="$1"
 	local commit_msg
 	local use_ai=true
