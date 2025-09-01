@@ -104,6 +104,23 @@ Git diff:
             # temperature=0.3,
         )
 
+        # Optional usage diagnostics (export AI_COMMIT_USAGE=1 to enable)
+        if os.getenv("AI_COMMIT_USAGE"):
+            usage = getattr(response, "usage", None)
+            if usage:
+                # Basic token counts
+                prompt_tokens = getattr(usage, "prompt_tokens", "?")
+                completion_tokens = getattr(usage, "completion_tokens", "?")
+                total_tokens = getattr(usage, "total_tokens", "?")
+                # Details (may not exist for all models)
+                comp_details = getattr(usage, "completion_tokens_details", None)
+                reasoning_tokens = getattr(comp_details, "reasoning_tokens", None) if comp_details else None
+                print(
+                    f"[ai-usage] prompt={prompt_tokens} completion={completion_tokens} total={total_tokens}"
+                    + (f" reasoning={reasoning_tokens}" if reasoning_tokens is not None else ""),
+                    file=sys.stderr,
+                )
+
         # Parse the structured response
         commit_data = response.choices[0].message.parsed
         summary = commit_data.summary
