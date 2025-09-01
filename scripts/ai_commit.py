@@ -107,7 +107,7 @@ Git diff:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format (e.g., 'feat:', 'fix:', 'docs:', etc.). Limit description to ≤ 12 lines, ≤ 600 characters total.",
+                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. You always use a conventional commit prefix format: 'feat:', 'fix:', 'docs:', 'refac:', 'chore:', etc... Limit description to ≤ 12 lines, ≤ 600 characters total.",
                 },
                 {"role": "user", "content": prompt},
             ],
