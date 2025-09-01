@@ -122,50 +122,8 @@ check_openai_key() {
 # git
 alias g="git"
 
-gitgo() {
-	local user_msg="$1"
-	local commit_msg
-	local use_ai=true
-	
-	# Check for --no-ai flag
-	if [ "$1" = "--no-ai" ]; then
-		use_ai=false
-		user_msg="$2"
-	fi
-	
-	git add .
-	
-	# Generate commit message
-	if [ "$use_ai" = true ]; then
-		# Capture both stdout and stderr to detect specific failures
-		ai_output=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>&1)
-		ai_exit_code=$?
-		
-		if [ $ai_exit_code -eq 0 ]; then
-			commit_msg="$ai_output"
-		else
-			# AI failed - show error and exit
-			echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
-			echo "$ai_output"
-			echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}gitgo --no-ai 'your message'${ENDCOLOR}"
-			return 1
-		fi
-	else
-		commit_msg="$user_msg"
-	fi
-	
-	# Ensure we have a commit message
-	if [ -z "$commit_msg" ]; then
-		echo "Enter commit message: "
-		read -r commit_msg
-	fi
-	
-	if ! git commit -m "$commit_msg"; then
-		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
-		return 1
-	fi
-	
-	git push
+display_commit_summary() {
+	local commit_msg="$1"
 	
 	# Display a nice summary
 	echo -e "\n${GREEN}✅ Commit Summary${ENDCOLOR}"
@@ -192,9 +150,76 @@ gitgo() {
 			fi
 		done
 	fi
+}
+
+gitgo() {
+	# Use commit() function to handle the commit part
+	if ! commit "$@"; then
+		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
+		return 1
+	fi
+	
+	# Push to remote
+	git push
+	
+	# Get the commit message for the summary
+	local commit_msg
+	commit_msg=$(git log -1 --pretty=format:"%B")
+	
+	# Display summary after push
+	display_commit_summary "$commit_msg"
 	
 	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'${ENDCOLOR}"
 	#TODO: detect all TODO lines in current branch and print them at end of function
+}
+
+commit() {
+	local user_msg="$1"
+	local commit_msg
+	local use_ai=true
+	
+	# Check for --no-ai flag
+	if [ "$1" = "--no-ai" ]; then
+		use_ai=false
+		user_msg="$2"
+	fi
+	
+	git add .
+	
+	# Generate commit message
+	if [ "$use_ai" = true ]; then
+		# Capture both stdout and stderr to detect specific failures
+		ai_output=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>&1)
+		ai_exit_code=$?
+		
+		if [ $ai_exit_code -eq 0 ]; then
+			commit_msg="$ai_output"
+		else
+			# AI failed - show error and exit
+			echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+			echo "$ai_output"
+			echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
+			return 1
+		fi
+	else
+		commit_msg="$user_msg"
+	fi
+	
+	# Ensure we have a commit message
+	if [ -z "$commit_msg" ]; then
+		echo "Enter commit message: "
+		read -r commit_msg
+	fi
+	
+	if ! git commit -m "$commit_msg"; then
+		echo -e "\n${LIGHTBLUE}Commit failed${ENDCOLOR}"
+		return 1
+	fi
+	
+	# Display summary using the shared function
+	display_commit_summary "$commit_msg"
+	
+	echo -e "\n${LIGHTBLUE}Tip: commit 'my commit msg' or commit --no-ai 'manual msg'${ENDCOLOR}"
 }
 
 # one letter aliases w/o options

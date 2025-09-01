@@ -129,8 +129,9 @@ Git diff:
                 if "401" in str(e):
                     print("API authentication issue detected, waiting 30 seconds and retrying...", file=sys.stderr)
                     import time
+
                     time.sleep(30)
-                    
+
                     # Retry the API call once
                     try:
                         response = client.chat.completions.parse(
@@ -146,7 +147,7 @@ Git diff:
                             max_completion_tokens=300,
                             temperature=0.3,
                         )
-                        
+
                         # Parse the structured response
                         commit_data = response.choices[0].message.parsed
                         summary = commit_data.summary
