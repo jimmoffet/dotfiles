@@ -212,8 +212,11 @@ commit() {
 	
 	# Ensure we have a commit message
 	if [ -z "$commit_msg" ]; then
-		echo "Enter commit message: "
-		read -r commit_msg
+		echo "Commit msg from AI: $commit_msg"
+		echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+		echo "$ai_output"
+		echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
+		return 1
 	fi
 	
 	if ! git commit -m "$commit_msg"; then

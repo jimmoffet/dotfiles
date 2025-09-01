@@ -138,10 +138,6 @@ Git diff:
         summary = commit_data.summary
         description = commit_data.description
 
-        # Check if summary is over 50 characters and warn
-        if len(summary) > 50:
-            print(f"Warning: Summary is {len(summary)} characters (recommended: ≤50)", file=sys.stderr)
-
         if user_message:
             summary = user_message
         # Reconstruct the commit message with proper formatting
@@ -190,7 +186,9 @@ def main():
     ai_message = generate_commit_message(user_message, git_diff)
 
     if ai_message.strip():
-        print(f"AI Message: {ai_message}")
+        # NOTE: the runner is capturing stdout as the return value
+        # TODO: capture various values (like usage and final output) as json key-value pairs, return json
+        print(f"{ai_message}")
         sys.exit(0)
     else:
         # AI failed, exit with error code to trigger fallback in gitgo
