@@ -132,7 +132,7 @@ display_commit_summary() {
 	# Display commit message with proper multi-line formatting
 	echo "$commit_msg" | while IFS= read -r line; do
 		if [ -n "$line" ]; then
-			echo "${line// /}"
+			echo "${line#"${line%%[![:space:]]*}"}"
 		else
 			echo ""
 		fi
