@@ -1,13 +1,13 @@
 #!/bin/sh
 
+echo "Checking for secrets..."
+
 if [ -f .git/hooks/pre-commit ]; then
     if ! .git/hooks/pre-commit "$@"; then
         echo 'Local pre-commit hook failed, please see output above'
         exit 1
     fi
 fi
-
-echo "Checking for secrets..."
 
 # Check if ggshield is installed, install if missing
 if ! command -v ggshield >/dev/null 2>&1; then

@@ -189,8 +189,8 @@ def main():
     # Generate commit message
     ai_message = generate_commit_message(user_message, git_diff)
 
-    if ai_message:
-        print(ai_message)
+    if ai_message.strip():
+        print(f"AI Message: {ai_message}")
         sys.exit(0)
     else:
         # AI failed, exit with error code to trigger fallback in gitgo

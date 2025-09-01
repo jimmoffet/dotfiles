@@ -188,6 +188,8 @@ commit() {
 	fi
 	
 	git add .
+
+	echo "Added all staged files. Generating commit msg..."
 	
 	# Generate commit message
 	if [ "$use_ai" = true ]; then
