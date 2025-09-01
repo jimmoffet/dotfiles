@@ -126,8 +126,7 @@ display_commit_summary() {
 	local commit_msg="$1"
 	
 	# Display a nice summary
-	echo -e "\n${GREEN}✅ Commit Summary${ENDCOLOR}"
-	echo -e "${CYAN}📝 Message:${ENDCOLOR}"
+	echo -e "${CYAN}📝 Commit Message:${ENDCOLOR}"
 	printf "\n"
 	# Display commit message with proper multi-line formatting
 	echo "$commit_msg" | while IFS= read -r line; do
@@ -144,7 +143,7 @@ display_commit_summary() {
 	local stats
 	stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
 	if [ -n "$stats" ]; then
-		echo -e "${CYAN}📊 Changes:${ENDCOLOR}\n"
+		echo -e "${CYAN}📊 Committed Changes:${ENDCOLOR}\n"
 		echo "$stats" | while IFS= read -r line; do
 			if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
 				echo -e "   ${YELLOW}$line${ENDCOLOR}"
@@ -156,6 +155,7 @@ display_commit_summary() {
 }
 
 gitgo() {
+	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'${ENDCOLOR}"
 	# Use commit() function to handle the commit part
 	if ! commit "$@"; then
 		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
@@ -172,7 +172,6 @@ gitgo() {
 	# Display summary after push
 	display_commit_summary "$commit_msg"
 	
-	echo -e "\n${LIGHTBLUE}Tip: gitgo 'my commit msg' or gitgo --no-ai 'manual msg'${ENDCOLOR}"
 	#TODO: detect all TODO lines in current branch and print them at end of function
 }
 
