@@ -128,13 +128,15 @@ display_commit_summary() {
 	# Display a nice summary
 	echo -e "\n${GREEN}✅ Commit Summary${ENDCOLOR}"
 	echo -e "${CYAN}📝 Message:${ENDCOLOR}"
+	printf "\n"
 	# Display commit message with proper multi-line formatting
 	echo "$commit_msg" | while IFS= read -r line; do
 		if [ -n "$line" ]; then
-			echo "    $line"
+			echo "$line"
 		else
 			echo ""
 		fi
+		printf "\n"
 	done
 	
 	# Get diff stats
