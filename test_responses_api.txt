@@ -1,1 +1,0 @@
-Test Responses API integration

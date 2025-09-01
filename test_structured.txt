@@ -1,2 +1,0 @@
-Test structured outputs
-Final test

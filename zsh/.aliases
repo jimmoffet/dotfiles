@@ -176,6 +176,8 @@ gitgo() {
 }
 
 commit() {
+	echo -e "\n${LIGHTBLUE}Tip: commit 'my commit msg' or commit --no-ai 'manual msg'${ENDCOLOR}"
+	
 	local user_msg="$1"
 	local commit_msg
 	local use_ai=true
@@ -226,7 +228,6 @@ commit() {
 	# Display summary using the shared function
 	display_commit_summary "$commit_msg"
 	
-	echo -e "\n${LIGHTBLUE}Tip: commit 'my commit msg' or commit --no-ai 'manual msg'${ENDCOLOR}"
 }
 
 # one letter aliases w/o options
