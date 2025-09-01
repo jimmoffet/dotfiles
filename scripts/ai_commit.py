@@ -91,7 +91,7 @@ Git diff:
     try:
         # Use Chat Completions API with structured outputs
         response = client.chat.completions.parse(
-            model="gpt-5-mini",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
