@@ -132,23 +132,24 @@ display_commit_summary() {
 	# Display commit message with proper multi-line formatting
 	echo "$commit_msg" | while IFS= read -r line; do
 		if [ -n "$line" ]; then
-			echo "${line#"${line%%[![:space:]]*}"}"
+			echo "    $(echo "$line" | sed 's/^[[:space:]]*//')"
 		else
 			echo ""
 		fi
-		printf "\n"
 	done
+
+	printf "\n"
 	
 	# Get diff stats
 	local stats
 	stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
 	if [ -n "$stats" ]; then
-		echo -e "${CYAN}📊 Changes:${ENDCOLOR}"
+		echo -e "${CYAN}📊 Changes:${ENDCOLOR}\n"
 		echo "$stats" | while IFS= read -r line; do
 			if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
-				echo -e "    ${YELLOW}$line${ENDCOLOR}"
+				echo -e "   ${YELLOW}$line${ENDCOLOR}"
 			else
-				echo "    $line"
+				echo "   $line"
 			fi
 		done
 	fi

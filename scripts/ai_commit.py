@@ -70,11 +70,11 @@ def generate_commit_message(user_message, git_diff):
 
     # Construct prompt for structured outputs
     if user_message:
-        prompt = f"""Based on the git diff below, enhance this commit message: "{user_message}"
+        prompt = f"""Based on the git diff below, enhance this user's commit message: "{user_message}"
 
 Analyze the changes and create a commit message with:
-- summary: A concise summary line that incorporates the user's message (aim for under 50 characters)
-- description: A more detailed description of what was changed and why
+- summary: Reproduce the user's commit message exactly, make no changes
+- description: A more detailed description of what was changed
 
 Git diff:
 {git_diff}"""
@@ -83,7 +83,7 @@ Git diff:
 
 Analyze the changes and create a commit message with:
 - summary: A concise summary line (aim for under 50 characters)
-- description: A more detailed description of what was changed and why
+- description: A more detailed description of what was changed
 
 Git diff:
 {git_diff}"""
@@ -95,7 +95,7 @@ Git diff:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format when appropriate (e.g., 'feat:', 'fix:', 'docs:', etc.).",
+                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format (e.g., 'feat:', 'fix:', 'docs:', etc.).",
                 },
                 {"role": "user", "content": prompt},
             ],
@@ -113,6 +113,8 @@ Git diff:
         if len(summary) > 50:
             print(f"Warning: Summary is {len(summary)} characters (recommended: ≤50)", file=sys.stderr)
 
+        if user_message:
+            summary = user_message
         # Reconstruct the commit message with proper formatting
         if description.strip():
             return f"{summary}\n\n{description}"
@@ -125,47 +127,7 @@ Git diff:
             from openai import APIError, APIConnectionError, RateLimitError, AuthenticationError
 
             if isinstance(e, AuthenticationError):
-                # Check if it's a 401 and retry once after delay
-                if "401" in str(e):
-                    print("API authentication issue detected, waiting 30 seconds and retrying...", file=sys.stderr)
-                    import time
-
-                    time.sleep(30)
-
-                    # Retry the API call once
-                    try:
-                        response = client.chat.completions.parse(
-                            model="gpt-4o-mini",
-                            messages=[
-                                {
-                                    "role": "system",
-                                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format when appropriate (e.g., 'feat:', 'fix:', 'docs:', etc.).",
-                                },
-                                {"role": "user", "content": prompt},
-                            ],
-                            response_format=CommitMessage,
-                            max_completion_tokens=300,
-                            temperature=0.3,
-                        )
-
-                        # Parse the structured response
-                        commit_data = response.choices[0].message.parsed
-                        summary = commit_data.summary
-                        description = commit_data.description
-
-                        # Check if summary is over 50 characters and warn
-                        if len(summary) > 50:
-                            print(f"Warning: Summary is {len(summary)} characters (recommended: ≤50)", file=sys.stderr)
-
-                        # Reconstruct the commit message with proper formatting
-                        if description.strip():
-                            return f"{summary}\n\n{description}"
-                        else:
-                            return summary
-                    except Exception as retry_e:
-                        print(f"Retry failed - OpenAI API authentication error: {retry_e}", file=sys.stderr)
-                else:
-                    print(f"OpenAI API authentication error: {e}", file=sys.stderr)
+                print(f"OpenAI API authentication error: {e}", file=sys.stderr)
             elif isinstance(e, RateLimitError):
                 print(f"OpenAI API rate limit exceeded: {e}", file=sys.stderr)
             elif isinstance(e, APIConnectionError):
