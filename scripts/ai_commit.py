@@ -91,17 +91,17 @@ Git diff:
     try:
         # Use Chat Completions API with structured outputs
         response = client.chat.completions.parse(
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format (e.g., 'feat:', 'fix:', 'docs:', etc.).",
+                    "content": "You are a helpful assistant that analyzes code changes and writes clear, conventional commit messages. Follow conventional commit format (e.g., 'feat:', 'fix:', 'docs:', etc.). Limit description to ≤ 12 lines, ≤ 600 characters total.",
                 },
                 {"role": "user", "content": prompt},
             ],
             response_format=CommitMessage,
-            max_completion_tokens=300,
-            temperature=0.3,
+            max_completion_tokens=600,
+            # temperature=0.3,
         )
 
         # Parse the structured response
