@@ -31,3 +31,13 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/macos
+
+.cache_ggshield
+**/credentials.json
+**/*credentials.json
+**/creds.json
+**/*creds.json
+**/.env
+**/.pem
+**/.crt
+

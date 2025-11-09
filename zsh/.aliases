@@ -322,6 +322,87 @@ gpr() {
 	gh pr create --base main --head $(git rev-parse --abbrev-ref HEAD) --title $(git rev-parse --abbrev-ref HEAD) --body $1
 }
 
+# AI-powered pull request
+pr() {
+	local guidance=""
+	local use_ai=true
+	local draft=false
+	local template=""
+	local base=""
+	
+	# Parse arguments
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			--no-ai)
+				use_ai=false
+				shift
+				;;
+			--draft)
+				draft=true
+				shift
+				;;
+			--template)
+				template="$2"
+				shift 2
+				;;
+			--base)
+				base="$2"
+				shift 2
+				;;
+			*)
+				# Remaining args are guidance text
+				guidance="$*"
+				break
+				;;
+		esac
+	done
+	
+	# Push current branch first if it has commits
+	echo "Pushing current branch..."
+	if ! git push -u origin HEAD 2>/dev/null; then
+		echo -e "${YELLOW}⚠️  Push failed or branch already pushed${ENDCOLOR}"
+	fi
+	
+	# Build command
+	local cmd="~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_pull_request.py"
+	
+	if [ "$use_ai" = false ]; then
+		cmd="$cmd --no-ai"
+	fi
+	
+	if [ "$draft" = true ]; then
+		cmd="$cmd --draft"
+	fi
+	
+	if [ -n "$template" ]; then
+		cmd="$cmd --template $template"
+	fi
+	
+	if [ -n "$base" ]; then
+		cmd="$cmd --base $base"
+	fi
+	
+	if [ -n "$guidance" ]; then
+		cmd="$cmd \"$guidance\""
+	fi
+	
+	# Execute and capture output
+	pr_output=$(eval $cmd 2>&1)
+	pr_exit_code=$?
+	
+	if [ $pr_exit_code -eq 0 ]; then
+		# Success - display PR URL
+		echo -e "\n${GREEN}✓ Pull Request Created!${ENDCOLOR}"
+		echo -e "${CYAN}$pr_output${ENDCOLOR}\n"
+	else
+		# Failed
+		echo -e "\n${YELLOW}⚠️  PR creation failed:${ENDCOLOR}"
+		echo "$pr_output"
+		echo -e "\n${LIGHTBLUE}💡 To create PR manually, use:${ENDCOLOR} ${YELLOW}gh pr create${ENDCOLOR}"
+		return 1
+	fi
+}
+
 # better ls
 alias ls="echo; colorls -A --group-directories-first"
 

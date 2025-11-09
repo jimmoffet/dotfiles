@@ -53,6 +53,10 @@ source $HOME/dotfiles/zsh/.aliases
 # [[ -z "$TMUX" ]] && exec tmux
 
 fpath+=~/.zfunc
+
+if type brew &>/dev/null; then
+  FPATH+="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
 autoload -Uz compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 
@@ -71,7 +75,7 @@ export PATH="$PATH:/Users/jim/.local/bin"
 
 export NVM_DIR="$HOME/.nvm"
 if [ ! -d "$NVM_DIR" ]; then
-    mkdir -p "$NVM_DIR"
+  mkdir -p "$NVM_DIR"
 fi
 
 [ -s "$(brew --prefix nvm)/nvm.sh" ] && . "$(brew --prefix nvm)/nvm.sh"
@@ -93,18 +97,15 @@ export PYENV_ROOT="$HOME/.pyenv"
 
 # Only initialize pyenv if we're not in an active virtual environment
 if [[ -z "$VIRTUAL_ENV" ]]; then
-    eval "$(pyenv init - zsh)"
+  eval "$(pyenv init - zsh)"
 else
-    # If in a virtual env, just set up pyenv without the shims
-    # eval "$(pyenv init - --no-rehash zsh)"
-    echo "Activated virtual env: $VIRTUAL_ENV"
-    . "$VIRTUAL_ENV/bin/activate"
+  # If in a virtual env, just set up pyenv without the shims
+  # eval "$(pyenv init - --no-rehash zsh)"
+  echo "Activated virtual env: $VIRTUAL_ENV"
+  . "$VIRTUAL_ENV/bin/activate"
 fi
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-
-
-

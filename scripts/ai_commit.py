@@ -4,7 +4,6 @@ import os
 import sys
 import subprocess
 import json
-from pathlib import Path
 from pydantic import BaseModel
 
 
@@ -82,7 +81,10 @@ def generate_commit_message(user_message, git_diff):
         return None
 
     # Limit diff size to prevent expensive API calls
-    max_diff_chars = 8000  # ~2000 tokens
+    # Can be overridden with AI_COMMIT_MAX_CHARS environment variable
+    # Default: 100,000 chars (~25,000 tokens at 4:1 ratio)
+    # At $0.40/1M input tokens, 25K tokens costs ~$0.01
+    max_diff_chars = int(os.getenv("AI_COMMIT_MAX_CHARS", "100000"))
     if len(git_diff) > max_diff_chars:
         git_diff = git_diff[:max_diff_chars] + "\n\n[diff truncated...]"
 
@@ -94,7 +96,7 @@ def generate_commit_message(user_message, git_diff):
 
 Analyze the changes and create a commit message with:
 - summary: Reproduce the user's commit message exactly, make no changes
-- description: A more detailed description of what was changed
+- description: A more detailed description of what was changed. Do not speculate on the dev's larger goals, just describe the code changes and direct impact unless broader intent is made explicit in comments or planning docs. You should describe changes to every single file in the diff.
 
 Git diff:
 {git_diff}"""
@@ -103,7 +105,7 @@ Git diff:
 
 Analyze the changes and create a commit message with:
 - summary: A concise summary line (aim for under 50 characters)
-- description: A more detailed description of what was changed
+- description: A more detailed description of what was changed. Do not speculate on the dev's larger goals, just describe the code changes and direct impact unless broader intent is made explicit in comments or planning docs. You should describe changes to every single file in the diff.
 
 Git diff:
 {git_diff}"""
@@ -192,8 +194,14 @@ Git diff:
 def main():
     user_message = sys.argv[1] if len(sys.argv) > 1 else ""
 
-    # Check if we're in a git repository
-    if not Path(".git").exists():
+    # Check if we're in a git repository (works from any subdirectory)
+    try:
+        subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError:
         print("Error: Not in a git repository", file=sys.stderr)
         sys.exit(1)
 
