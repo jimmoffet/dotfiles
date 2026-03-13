@@ -2,10 +2,30 @@
 
 echo "Checking for secrets..."
 
-if [ -f .git/hooks/pre-commit ]; then
-  if ! .git/hooks/pre-commit "$@"; then
-    echo 'Local pre-commit hook failed, please see output above'
-    exit 1
+# Run repo pre-commit hooks if a config is present.
+#
+# When core.hooksPath is set, `.git/hooks/pre-commit` generally won't exist,
+# so chaining to it doesn't run the repo's pre-commit config.
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/.pre-commit-config.yaml" ]; then
+  echo "Running repo pre-commit hooks..."
+  if command -v uv >/dev/null 2>&1 && [ -f "$REPO_ROOT/uv.lock" ]; then
+    (cd "$REPO_ROOT" && uv run pre-commit run --hook-stage pre-commit)
+    PRECOMMIT_EXIT_CODE=$?
+  elif command -v poetry >/dev/null 2>&1 && [ -f "$REPO_ROOT/pyproject.toml" ]; then
+    (cd "$REPO_ROOT" && poetry run pre-commit run --hook-stage pre-commit)
+    PRECOMMIT_EXIT_CODE=$?
+  elif command -v pre-commit >/dev/null 2>&1; then
+    (cd "$REPO_ROOT" && pre-commit run --hook-stage pre-commit)
+    PRECOMMIT_EXIT_CODE=$?
+  else
+    echo "pre-commit not found (and no Poetry); skipping repo pre-commit hooks"
+    PRECOMMIT_EXIT_CODE=0
+  fi
+
+  if [ $PRECOMMIT_EXIT_CODE -ne 0 ]; then
+    echo 'Repo pre-commit hooks failed, please see output above'
+    exit $PRECOMMIT_EXIT_CODE
   fi
 fi
 
@@ -24,6 +44,7 @@ if ! command -v ggshield >/dev/null 2>&1; then
     exit 1
   fi
 fi
+
 
 # Run ggshield secret scan
 ggshield secret scan pre-commit "$@"

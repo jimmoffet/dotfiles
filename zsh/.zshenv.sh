@@ -43,4 +43,4 @@ if [[ -d "$TMPDIR" ]]; then
 fi
 
 # misc program exports
-source $HOME/dotfiles/shell/exports
+[ -f "$HOME/dotfiles/shell/exports" ] && source "$HOME/dotfiles/shell/exports"

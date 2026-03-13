@@ -26,10 +26,9 @@ def get_git_diff():
                 "--no-color",  # Ensure no ANSI color codes
             ],
             capture_output=True,
-            text=True,
             check=True,
         )
-        return result.stdout.strip()
+        return result.stdout.decode("utf-8", errors="replace").strip()
     except subprocess.CalledProcessError:
         return None
 
@@ -136,18 +135,10 @@ Git diff:
                 total_tokens = getattr(usage, "total_tokens", "?")
                 # Details (may not exist for all models)
                 comp_details = getattr(usage, "completion_tokens_details", None)
-                reasoning_tokens = (
-                    getattr(comp_details, "reasoning_tokens", None)
-                    if comp_details
-                    else None
-                )
+                reasoning_tokens = getattr(comp_details, "reasoning_tokens", None) if comp_details else None
                 print(
                     f"[ai-usage] prompt={prompt_tokens} completion={completion_tokens} total={total_tokens}"
-                    + (
-                        f" reasoning={reasoning_tokens}"
-                        if reasoning_tokens is not None
-                        else ""
-                    ),
+                    + (f" reasoning={reasoning_tokens}" if reasoning_tokens is not None else ""),
                     file=sys.stderr,
                 )
 
@@ -214,7 +205,7 @@ def main():
     # Generate commit message
     ai_message = generate_commit_message(user_message, git_diff)
 
-    if ai_message.strip():
+    if ai_message and ai_message.strip():
         # NOTE: the runner is capturing stdout as the return value
         # TODO: capture various values (like usage and final output) as json key-value pairs, return json
         print(f"{ai_message}")

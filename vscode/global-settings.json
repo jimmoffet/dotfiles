@@ -41,6 +41,14 @@
   "material-icon-theme.folders.theme": "specific",
   "python.linting.enabled": false,
   "python.jediEnabled": false,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.usePythonEnvironmentsExtension": true,
+  "python-envs.alwaysUseUv": true,
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.terminal.autoActivationType": "shellStartup",
+  "rubyLsp.rubyVersionManager": {
+    "identifier": "mise"
+  },
   "telemetry.enableCrashReporter": false,
   "telemetry.enableTelemetry": false,
   "terminal.external.osxExec": "iTerm",

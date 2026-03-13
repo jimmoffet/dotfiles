@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
+dotfiles_env="$HOME/dotfiles/.env"
+if [ -f "$dotfiles_env" ]; then
+	set -a
+	. "$dotfiles_env"
+	set +a
+fi
+unset dotfiles_env
 
 # add ~/bin to path
 PATH=/usr/bin:/bin:/usr/sbin:/sbin
@@ -12,10 +18,6 @@ PATH=/opt/homebrew/bin:/opt/homebrew/sbin:$PATH # this is for 2020 M1 macbook
 PATH=/opt/homebrew/opt:$PATH                    # this is for 2020 M1 macbook
 export PATH
 
-# export PATH="$HOME/.rbenv/bin:$PATH"
-# eval "$(rbenv init -)"
-# export PATH=/Users/jim/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0/gems:$PATH
-
 # prefer US English & utf-8
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US"
@@ -23,12 +25,6 @@ export LANG="en_US"
 # Avoid issues with `gpg` as installed via Homebrew.
 # https://stackoverflow.com/a/42265848/96656
 export GPG_TTY=$(tty)
-
-# configure ruby
-# source $mybrewpackages/chruby/chruby.sh
-# source $mybrewpackages/chruby/auto.sh
-# source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/chruby.sh
-# source /opt/homebrew/Cellar/chruby/0.3.9/share/chruby/auto.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
@@ -69,12 +65,3 @@ export RIPGREP_CONFIG_PATH=$HOME/.rgrc
 export PATH="/usr/local/opt/util-linux/bin:$PATH"
 export PATH="/usr/local/opt/util-linux/sbin:$PATH"
 
-# # pyenv
-# export PYENV_ROOT="$HOME/.pyenv"
-# export PATH=$PYENV_ROOT/bin:$PATH
-# eval "$(pyenv init -)"
-# export PYENV_SHELL=zsh
-# command pyenv rehash 2>/dev/null
-
-# direnv
-eval "$(direnv hook zsh)"

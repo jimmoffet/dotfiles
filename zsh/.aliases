@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-export $(grep -v '^#' $HOME/dotfiles/.env | xargs -0)
-
 # cloud foundry
 
 # login
-alias cflogin="cf login -a api.fr.cloud.gov --sso"
+# alias cflogin="cf login -a api.fr.cloud.gov --sso"
 
 # execute command in a new Terminal.app window
 newterm() {
-	var=$@
-	osascript - "$var" <<EOF
+  echo "newterm: run a command in a new Terminal.app window. Usage: newterm <command>"
+  var=$@
+  osascript - "$var" <<EOF
     on run argv -- argv is a list of strings
       tell application "Terminal"
         activate
@@ -25,30 +24,31 @@ EOF
 
 alias boop='open -a boop'
 
-dot() {
-	if [ "$1" = "help" ]; then
-		echo "Usage: dot <command>"
-		declare -a funcs=(
-			"create_dirs"
-			"build_xcode"
-			"install_brew"
-			"mac_defaults_write"
-			"install_docker"
-			#   "configure_ruby"
-			"configure_node"
-			"configure_python"
-			"configure_vim"
-			"set_up_aws"
-			"stow_dotfiles"
-			"set_up_vscode"
-			"set_up_touchid"
-		)
-		for i in "${funcs[@]}"; do
-			printf "dot $i\n"
-		done
-	else
-		$HOME/dotfiles/install.sh $@
-	fi
+installdotfiles() {
+  echo "installdotfiles: run dotfiles install steps or show available install commands. Usage: installdotfiles [help|install_step]"
+  if [ "$1" = "help" ]; then
+    echo "Usage: dot <command>"
+    declare -a funcs=(
+      "create_dirs"
+      "build_xcode"
+      "install_brew"
+      "mac_defaults_write"
+      "install_docker"
+      #   "configure_ruby"
+      "configure_node"
+      "configure_python"
+      "configure_vim"
+      "set_up_aws"
+      "stow_dotfiles"
+      "set_up_vscode"
+      "set_up_touchid"
+    )
+    for i in "${funcs[@]}"; do
+      printf "dot $i\n"
+    done
+  else
+    $HOME/dotfiles/install.sh $@
+  fi
 }
 
 LIGHTBLUE="\e[94m"
@@ -58,183 +58,303 @@ CYAN="\e[96m"
 YELLOW="\e[93m"
 RED="\e[91m"
 
+dot() {
+  echo "dot: list every function and its first echo/help line. Usage: dot"
+
+  local aliases_file="$HOME/dotfiles/zsh/.aliases"
+
+  if [ ! -f "$aliases_file" ]; then
+    echo -e "${RED}Could not find aliases file:${ENDCOLOR} $aliases_file"
+    return 1
+  fi
+
+  local rows
+  rows=$(awk '
+    function trim(s) {
+      sub(/^[[:space:]]+/, "", s)
+      sub(/[[:space:]]+$/, "", s)
+      return s
+    }
+
+    /^[[:space:]]*[A-Za-z_][A-Za-z0-9_-]*[[:space:]]*\(\)[[:space:]]*\{/ {
+      line = $0
+      sub(/^[[:space:]]*/, "", line)
+      fn = line
+      sub(/[[:space:]]*\(\)[[:space:]]*\{.*/, "", fn)
+      in_fn = 1
+      next
+    }
+
+    in_fn {
+      if ($0 ~ /^[[:space:]]*$/) {
+        next
+      }
+
+      line = $0
+      if (line ~ /^[[:space:]]*echo([[:space:]]|$)/) {
+        sub(/^[[:space:]]*echo([[:space:]]+-e)?[[:space:]]*/, "", line)
+        line = trim(line)
+
+        if (line ~ /^"/) {
+          sub(/^"/, "", line)
+          sub(/"$/, "", line)
+        } else if (line ~ /^\047/) {
+          sub(/^\047/, "", line)
+          sub(/\047$/, "", line)
+        }
+
+        print fn "\t" line
+      } else {
+        print fn "\t(no first echo line found)"
+      }
+
+      in_fn = 0
+    }
+  ' "$aliases_file")
+
+  echo -e "\n${CYAN}📚 Dotfiles Function Help${ENDCOLOR}"
+  local fn_col_width=24
+  local term_width="${COLUMNS:-$(tput cols 2>/dev/null || echo 100)}"
+
+  if ! [[ "$term_width" =~ ^[0-9]+$ ]]; then
+    term_width=100
+  fi
+
+  local min_width=$((fn_col_width + 30))
+  if [ "$term_width" -lt "$min_width" ]; then
+    term_width="$min_width"
+  fi
+
+  local help_width=$((term_width - fn_col_width - 1))
+  local divider
+  divider=$(printf "%*s" "$term_width" "" | tr ' ' '─')
+
+  echo -e "${LIGHTBLUE}${divider}${ENDCOLOR}"
+
+  local count=0
+  local wrapped_help
+  local formatted_help
+  local first_line
+  local line
+  while IFS=$'\t' read -r fn help_line; do
+    [ -z "$fn" ] && continue
+    count=$((count + 1))
+
+    if [[ "$help_line" == "$fn: "* ]]; then
+      help_line="${help_line#"$fn: "}"
+    fi
+
+    formatted_help=$(printf "%s" "$help_line" | sed 's/[[:space:]]\+Usage:/\
+Usage:/')
+    wrapped_help=$(printf "%s" "$formatted_help" | fold -s -w "$help_width")
+
+    first_line=true
+    while IFS= read -r line; do
+      if [ "$first_line" = true ]; then
+        builtin printf "${YELLOW}%*s${ENDCOLOR} ${LIGHTBLUE}%s${ENDCOLOR}\n" "$fn_col_width" "$fn" "$line"
+        first_line=false
+      elif [[ "$line" == Usage:* ]]; then
+        local usage_args="${line#Usage: }"
+        builtin printf "%-*s ${LIGHTBLUE}Usage:${ENDCOLOR} ${YELLOW}%s${ENDCOLOR}\n" "$fn_col_width" "" "$usage_args"
+      else
+        builtin printf "%-*s ${LIGHTBLUE}%s${ENDCOLOR}\n" "$fn_col_width" "" "$line"
+      fi
+    done <<< "$wrapped_help"
+
+    builtin printf "\n"
+  done <<< "$rows"
+
+  echo -e "${LIGHTBLUE}${divider}${ENDCOLOR}"
+  echo -e "${GREEN}Total functions:${ENDCOLOR} $count"
+}
+
 # find stuff
 findall() {
-	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o $@ -print
-	echo "\n${LIGHTBLUE}Tip: findall -type d -name 'screenshots'${ENDCOLOR}"
+  echo "findall: search the filesystem with custom find arguments (excluding common system paths). Usage: findall <find-args>"
+  find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o $@ -print
+  echo "\n${LIGHTBLUE}Tip: findall -type d -name 'screenshots'${ENDCOLOR}"
 }
 
 finddir() {
-	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type d -iname $@ -print
-	echo "\n${LIGHTBLUE}Tip: finddir scrEenShotS${ENDCOLOR}"
+  echo "finddir: find directories by case-insensitive name (excluding common system paths). Usage: finddir <name-pattern>"
+  find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type d -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: finddir scrEenShotS${ENDCOLOR}"
 }
 
 findfile() {
-	find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type f -iname $@ -print
-	echo "\n${LIGHTBLUE}Tip: findfile brEW${ENDCOLOR}"
+  echo "findfile: find files by case-insensitive name (excluding common system paths). Usage: findfile <name-pattern>"
+  find / -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type f -iname $@ -print
+  echo "\n${LIGHTBLUE}Tip: findfile brEW${ENDCOLOR}"
 }
 
 findin() {
-	find $1 -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type $2 -iname $3 -print
-	echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
+  echo "findin: search within a specific root path by type and case-insensitive name. Usage: findin <root-path> <f|d> <name-pattern>"
+  find $1 -path '*/Library/*' -prune -o -path '/System/*' -prune -o -path '/private/*' -prune -o -path '/dev/*' -prune -o -path '/usr/sbin/authserver' -prune -o -type $2 -iname $3 -print
+  echo "\n${LIGHTBLUE}Tip: findin $HOME d screenshots${ENDCOLOR}"
 }
 
 findprocess() {
-	ps ax | grep $@
-	echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
+  echo "findprocess: search running processes using grep. Usage: findprocess <pattern>"
+  ps ax | grep $@
+  echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
 }
 
 killallprocesses() {
-	pkill -f $@
-	echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
-}
-
-zoff() {
-	sudo launchctl unload /Library/LaunchDaemons/com.zscaler.service.plist /Library/LaunchDaemons/com.zscaler.tunnel.plist
-}
-
-zon() {
-	sudo launchctl load /Library/LaunchDaemons/com.zscaler.service.plist /Library/LaunchDaemons/com.zscaler.tunnel.plist
+  echo "killallprocesses: kill processes by full command-line match. Usage: killallprocesses <pattern>"
+  pkill -f $@
+  echo "\n${LIGHTBLUE}Note: case-sensitive Tip: findprocess Google${ENDCOLOR}"
 }
 
 # OpenAI API Key management
 set_openai_key() {
-	if [ -z "$1" ]; then
-		echo "Usage: set_openai_key <api-key>"
-		echo "This will securely store your OpenAI API key in macOS Keychain"
-		return 1
-	fi
-	security add-generic-password -a "$USER" -s "openai-api-key" -w "$1" -U
-	echo "OpenAI API key stored securely in Keychain"
+  echo "set_openai_key: store an OpenAI API key in macOS Keychain. Usage: set_openai_key <api-key>"
+  if [ -z "$1" ]; then
+    echo "Usage: set_openai_key <api-key>"
+    echo "This will securely store your OpenAI API key in macOS Keychain"
+    return 1
+  fi
+  security add-generic-password -a "$USER" -s "openai-api-key" -w "$1" -U
+  echo "OpenAI API key stored securely in Keychain"
 }
 
 check_openai_key() {
-	local key
-	key=$(security find-generic-password -a "$USER" -s "openai-api-key" -w 2>/dev/null)
-	if [ $? -eq 0 ] && [ -n "$key" ]; then
-		echo -e "OpenAI API key found in Keychain (first 10 chars: ${YELLOW}${key:0:10}...${ENDCOLOR})"
-	else
-		echo "No OpenAI API key found in Keychain"
-		echo -e "Use '${YELLOW}set_openai_key <your-key>${ENDCOLOR}' to store it securely"
-	fi
+  echo "check_openai_key: verify whether an OpenAI API key exists in Keychain. Usage: check_openai_key"
+  local key
+  key=$(security find-generic-password -a "$USER" -s "openai-api-key" -w 2>/dev/null)
+  if [ $? -eq 0 ] && [ -n "$key" ]; then
+    echo -e "OpenAI API key found in Keychain (first 10 chars: ${YELLOW}${key:0:10}...${ENDCOLOR})"
+  else
+    echo "No OpenAI API key found in Keychain"
+    echo -e "Use '${YELLOW}set_openai_key <your-key>${ENDCOLOR}' to store it securely"
+  fi
 }
 
 # git
 alias g="git"
 
 display_commit_summary() {
-	local commit_msg="$1"
-	
-	# Display a nice summary
-	echo -e "${CYAN}\n📝 Commit Message:${ENDCOLOR}"
-	printf "\n"
-	# Display commit message with proper multi-line formatting
-	echo "$commit_msg" | while IFS= read -r line; do
-		if [ -n "$line" ]; then
-			echo "    $(echo "$line" | sed 's/^[[:space:]]*//')"
-		else
-			echo ""
-		fi
-	done
+  echo "display_commit_summary: print a commit stats and message summary. Usage: display_commit_summary \"<commit-message>\""
+  local commit_msg="$1"
 
-	printf "\n"
-	
-	# Get diff stats
-	local stats
-	stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
-	if [ -n "$stats" ]; then
-		echo -e "${CYAN}📊 Committed Changes:${ENDCOLOR}\n"
-		echo "$stats" | while IFS= read -r line; do
-			if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
-				echo -e "   ${YELLOW}$line${ENDCOLOR}"
-			else
-				echo "   $line"
-			fi
-		done
-	fi
+  # Get diff stats
+  local stats
+  stats=$(git diff --stat HEAD~1 HEAD 2>/dev/null)
+  if [ -n "$stats" ]; then
+    echo -e "${CYAN}📊 Committed Changes:${ENDCOLOR}\n"
+    echo "$stats" | while IFS= read -r line; do
+      if [[ "$line" =~ [0-9]+.*file.*changed ]]; then
+        echo -e "   ${YELLOW}$line${ENDCOLOR}"
+      else
+        echo "   $line"
+      fi
+    done
+  fi
+
+  printf "\n"
+
+  # Display a nice summary
+  echo -e "${CYAN}\n📝 Commit Message:${ENDCOLOR}"
+  printf "\n"
+  # Display commit message with proper multi-line formatting
+  echo "$commit_msg" | while IFS= read -r line; do
+    if [ -n "$line" ]; then
+      echo "    $(echo "$line" | sed 's/^[[:space:]]*//')"
+    else
+      echo ""
+    fi
+  done
 }
 
 gitgo() {
-	# Use commit() function to handle the commit part (suppress summary)
-	if ! commit --from-gitgo "$@"; then
-		echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
-		return 1
-	fi
-	
-	# Push to remote
-	git push
-	
-	# Get the commit message for the summary
-	local commit_msg
-	commit_msg=$(git log -1 --pretty=format:"%B")
-	
-	# Display summary after push
-	display_commit_summary "$commit_msg"
-	
-	#TODO: detect all TODO lines in current branch and print them at end of function
+  echo "gitgo: commit all changes, write auto-message and push current branch. Usage: gitgo [optional-commit-guidance]"
+  # Use commit() function to handle the commit part (suppress summary)
+  if ! commit --from-gitgo "$@"; then
+    echo -e "\n${LIGHTBLUE}Commit failed, aborting push${ENDCOLOR}"
+    return 1
+  fi
+
+  # Push to remote
+  if ! git push; then
+    return 1
+  fi
+
+  # Get the commit message for the summary
+  local commit_msg
+  commit_msg=$(git log -1 --pretty=format:"%B")
+
+  # Display summary after push
+  display_commit_summary "$commit_msg"
+
+  #TODO: detect all TODO lines in current branch and print them at end of function
 }
 
 commit() {
-	local user_msg="$1"
-	local commit_msg
-	local use_ai=true
-	local from_gitgo=false
-	
-	# Check for --from-gitgo flag (internal use)
-	if [ "$1" = "--from-gitgo" ]; then
-		from_gitgo=true
-		shift
-		user_msg="$1"
-	fi
-	
-	# Check for --no-ai flag
-	if [ "$1" = "--no-ai" ]; then
-		use_ai=false
-		user_msg="$2"
-	fi
-	
-	git add .
+  echo "commit: stage all changes and create a commit (AI by default). Usage: commit [--no-ai] [message]"
+  local user_msg="$1"
+  local commit_msg
+  local use_ai=true
+  local from_gitgo=false
 
-	echo "Added all staged files. Generating commit msg..."
-	
-	# Generate commit message
-	if [ "$use_ai" = true ]; then
-		# Capture both stdout and stderr to detect specific failures
-		ai_output=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>&1)
-		ai_exit_code=$?
-		
-		if [ $ai_exit_code -eq 0 ]; then
-			commit_msg="$ai_output"
-		else
-			# AI failed - show error and exit
-			echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
-			echo "$ai_output"
-			echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
-			return 1
-		fi
-	else
-		commit_msg="$user_msg"
-	fi
-	
-	# Ensure we have a commit message
-	if [ -z "$commit_msg" ]; then
-		echo "Commit msg from AI: $commit_msg"
-		echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
-		echo "$ai_output"
-		echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
-		return 1
-	fi
-	
-	if ! git commit -m "$commit_msg"; then
-		echo -e "\n${LIGHTBLUE}Commit failed${ENDCOLOR}"
-		return 1
-	fi
-	
-	# Display summary only if not called from gitgo()
-	if [ "$from_gitgo" = false ]; then
-		display_commit_summary "$commit_msg"
-	fi
-	
+  # Check for --from-gitgo flag (internal use)
+  if [ "$1" = "--from-gitgo" ]; then
+    from_gitgo=true
+    shift
+    user_msg="$1"
+  fi
+
+  # Check for --no-ai flag
+  if [ "$1" = "--no-ai" ]; then
+    use_ai=false
+    user_msg="$2"
+  fi
+
+  git add .
+
+  echo "Added all staged files. Generating commit msg..."
+
+  # Generate commit message
+  if [ "$use_ai" = true ]; then
+    # Capture both stdout and stderr to detect specific failures
+    ai_output=$(~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_commit.py "$user_msg" 2>&1)
+    ai_exit_code=$?
+
+    if [ $ai_exit_code -eq 0 ]; then
+      commit_msg="$ai_output"
+    else
+      # AI failed - show error and exit
+      echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+      echo "$ai_output"
+      echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
+      return 1
+    fi
+  else
+    commit_msg="$user_msg"
+  fi
+
+  # Ensure we have a commit message
+  if [ -z "$commit_msg" ]; then
+    echo "Commit msg from AI: $commit_msg"
+    echo -e "\n${YELLOW}⚠️  AI commit generation failed:${ENDCOLOR}"
+    echo "$ai_output"
+    echo -e "\n${LIGHTBLUE}💡 To commit manually, use:${ENDCOLOR} ${YELLOW}commit --no-ai 'your message'${ENDCOLOR}"
+    return 1
+  fi
+
+  if ! git commit -m "$commit_msg"; then
+    echo -e "\n${LIGHTBLUE}Commit failed${ENDCOLOR}"
+    return 1
+  fi
+
+  # Display summary only if not called from gitgo()
+  if [ "$from_gitgo" = false ]; then
+    display_commit_summary "$commit_msg"
+  fi
+
+}
+
+cleandocker() {
+  echo "cleandocker: remove unused Docker images, volumes, networks, and builder cache. Usage: cleandocker"
+  docker image prune -a -f && docker volume prune -f && docker network prune -f && docker builder prune -a -f
 }
 
 # one letter aliases w/o options
@@ -278,7 +398,6 @@ alias gchp="git cherry-pick"
 alias gcl="git clone"
 
 # commit
-alias gcm="git commit -m"
 alias gcam="git commit --amend --message"
 
 # diff
@@ -319,88 +438,106 @@ alias gbi="git browse -- issues"
 
 # pull-request
 gpr() {
-	gh pr create --base main --head $(git rev-parse --abbrev-ref HEAD) --title $(git rev-parse --abbrev-ref HEAD) --body $1
+  echo "gpr: create a GitHub PR targeting main from current branch. Usage: gpr \"<pr-body>\""
+  gh pr create --base main --head $(git rev-parse --abbrev-ref HEAD) --title $(git rev-parse --abbrev-ref HEAD) --body $1
 }
 
 # AI-powered pull request
 pr() {
-	local guidance=""
-	local use_ai=true
-	local draft=false
-	local template=""
-	local base=""
-	
-	# Parse arguments
-	while [[ $# -gt 0 ]]; do
-		case "$1" in
-			--no-ai)
-				use_ai=false
-				shift
-				;;
-			--draft)
-				draft=true
-				shift
-				;;
-			--template)
-				template="$2"
-				shift 2
-				;;
-			--base)
-				base="$2"
-				shift 2
-				;;
-			*)
-				# Remaining args are guidance text
-				guidance="$*"
-				break
-				;;
-		esac
-	done
-	
-	# Push current branch first if it has commits
-	echo "Pushing current branch..."
-	if ! git push -u origin HEAD 2>/dev/null; then
-		echo -e "${YELLOW}⚠️  Push failed or branch already pushed${ENDCOLOR}"
-	fi
-	
-	# Build command
-	local cmd="~/dotfiles/.venv/bin/python ~/dotfiles/scripts/ai_pull_request.py"
-	
-	if [ "$use_ai" = false ]; then
-		cmd="$cmd --no-ai"
-	fi
-	
-	if [ "$draft" = true ]; then
-		cmd="$cmd --draft"
-	fi
-	
-	if [ -n "$template" ]; then
-		cmd="$cmd --template $template"
-	fi
-	
-	if [ -n "$base" ]; then
-		cmd="$cmd --base $base"
-	fi
-	
-	if [ -n "$guidance" ]; then
-		cmd="$cmd \"$guidance\""
-	fi
-	
-	# Execute and capture output
-	pr_output=$(eval $cmd 2>&1)
-	pr_exit_code=$?
-	
-	if [ $pr_exit_code -eq 0 ]; then
-		# Success - display PR URL
-		echo -e "\n${GREEN}✓ Pull Request Created!${ENDCOLOR}"
-		echo -e "${CYAN}$pr_output${ENDCOLOR}\n"
-	else
-		# Failed
-		echo -e "\n${YELLOW}⚠️  PR creation failed:${ENDCOLOR}"
-		echo "$pr_output"
-		echo -e "\n${LIGHTBLUE}💡 To create PR manually, use:${ENDCOLOR} ${YELLOW}gh pr create${ENDCOLOR}"
-		return 1
-	fi
+  echo "pr: create a GitHub PR with optional AI-generated content. Usage: pr [--no-ai] [--draft] [--dry-run] [--template <name>] [--base <branch>] [guidance]"
+  local guidance=""
+  local use_ai=true
+  local draft=false
+  local dry_run=false
+  local template=""
+  local base=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --no-ai)
+      use_ai=false
+      shift
+      ;;
+    --draft)
+      draft=true
+      shift
+      ;;
+    --dry-run)
+      dry_run=true
+      shift
+      ;;
+    --template)
+      template="$2"
+      shift 2
+      ;;
+    --base)
+      base="$2"
+      shift 2
+      ;;
+    *)
+      # Remaining args are guidance text
+      guidance="$*"
+      break
+      ;;
+    esac
+  done
+
+  # Push current branch first if it has commits (skip in dry-run)
+  if [ "$dry_run" = false ]; then
+    echo "Pushing current branch..."
+    if ! git push -u origin HEAD 2>/dev/null; then
+      echo -e "${YELLOW}⚠️  Push failed or branch already pushed${ENDCOLOR}"
+    fi
+  fi
+
+  # Build command
+  local cmd="$HOME/dotfiles/.venv/bin/python $HOME/dotfiles/scripts/ai_pull_request.py"
+
+  if [ "$use_ai" = false ]; then
+    cmd="$cmd --no-ai"
+  fi
+
+  if [ "$draft" = true ]; then
+    cmd="$cmd --draft"
+  fi
+
+  if [ "$dry_run" = true ]; then
+    cmd="$cmd --dry-run"
+  fi
+
+  if [ -n "$template" ]; then
+    cmd="$cmd --template $template"
+  fi
+
+  if [ -n "$base" ]; then
+    cmd="$cmd --base $base"
+  fi
+
+  if [ -n "$guidance" ]; then
+    cmd="$cmd \"$guidance\""
+  fi
+
+  # Execute and capture output
+  pr_output=$(eval $cmd 2>&1)
+  pr_exit_code=$?
+
+  if [ $pr_exit_code -eq 0 ]; then
+    if [ "$dry_run" = true ]; then
+      # Dry run - just show output
+      echo "$pr_output"
+    else
+      # Success - display PR URL
+      echo -e "\n${GREEN}✓ Pull Request Created!${ENDCOLOR}"
+      echo -e "${CYAN}$pr_output${ENDCOLOR}\n"
+    fi
+  else
+    # Failed
+    echo -e "\n${YELLOW}⚠️  PR creation failed:${ENDCOLOR}"
+    echo "$pr_output"
+    echo -e "\n${LIGHTBLUE}💡 To create PR manually, use:${ENDCOLOR} ${YELLOW}gh pr create${ENDCOLOR}"
+    return 1
+  fi
 }
 
 # better ls
@@ -411,7 +548,7 @@ alias ls="echo; colorls -A --group-directories-first"
 ###
 
 # files output
-alias tail="gtail -F" # follows log rotations
+# alias tail="gtail -F" # follows log rotations
 alias split="gsplit"
 alias csplit="gcsplit"
 
@@ -547,7 +684,6 @@ alias x+="chmod +x"
 alias restart="sudo reboot"
 alias bye="sudo shutdown -r now"
 alias get="curl -O -L"
-alias vi="vim"
 alias reload="source ~/.zshrc"
 
 # use ccat
@@ -599,88 +735,120 @@ alias xcodepurge="rm -rf ~/Library/Developer/Xcode/DerivedData"
 
 # use gitignore.io cmd line tool
 gi() {
-	curl -L -s https://www.gitignore.io/api/$@
+  echo "gi: fetch .gitignore templates from gitignore.io. Usage: gi <template1,template2,...>"
+  curl -L -s https://www.gitignore.io/api/$@
 }
 
 filter() {
-	"$HOME"/filter.sh "$@"
+  echo "filter: run your local filter script with passthrough args. Usage: filter <args>"
+  "$HOME"/filter.sh "$@"
 }
 
 # create a remote repo
 create-repo() {
-	# Get user input
-	echo "Enter name for new repo"
-	read REPONAME
-	echo "Do you want to make it private? (y/n)"
-	read -r -n PRIVATE_ANSWER
+  echo "create-repo: create a new GitHub repo and push initial commit. Usage: create-repo"
+  # Get user input
+  echo "Enter name for new repo"
+  read REPONAME
+  echo "Do you want to make it private? (y/n)"
+  read -r -n PRIVATE_ANSWER
 
-	if [[ "$PRIVATE_ANSWER" =~ ^[Yy]$ ]]; then
-		PRIVATE_TF=true
-	else
-		PRIVATE_TF=false
-	fi
+  if [[ "$PRIVATE_ANSWER" =~ ^[Yy]$ ]]; then
+    PRIVATE_TF=true
+  else
+    PRIVATE_TF=false
+  fi
 
-	# Curl some json to the github API oh damn we so fancy
-	curl -u gretzky https://api.github.com/user/repos -d "{\"name\": \"$REPONAME\", \"private\": $PRIVATE_TF}" >/dev/null
+  # Curl some json to the github API oh damn we so fancy
+  curl -u gretzky https://api.github.com/user/repos -d "{\"name\": \"$REPONAME\", \"private\": $PRIVATE_TF}" >/dev/null
 
-	# first commit
-	git init 1>/dev/null
-	gi macos,visualstudiocode >>.gitignore 1>/dev/null
-	print_success ".gitignore added"
-	git add . 1>/dev/null
-	git commit -m "initial commit" 1>/dev/null
-	print_success "initial commit"
-	git remote add origin https://github.com/gretzky/$REPONAME.git 1>/dev/null
-	git push -u origin master --force 1>/dev/null
+  # first commit
+  git init 1>/dev/null
+  gi macos,visualstudiocode >>.gitignore 1>/dev/null
+  print_success ".gitignore added"
+  git add . 1>/dev/null
+  git commit -m "initial commit" 1>/dev/null
+  print_success "initial commit"
+  git remote add origin https://github.com/gretzky/$REPONAME.git 1>/dev/null
+  git push -u origin master --force 1>/dev/null
 
-	sleep 0.5
-	print_success "\nRepo created"
-	print_in_cyan "You can view your new repo at https://github.com/gretzky/$REPONAME.git"
+  sleep 0.5
+  print_success "\nRepo created"
+  print_in_cyan "You can view your new repo at https://github.com/gretzky/$REPONAME.git"
 }
 
 # make new dir and cd into it
 take() {
-	mkdir -p $1
-	cd $1
+  echo "take: create a directory and cd into it. Usage: take <directory>"
+  mkdir -p $1
+  cd $1
 }
 alias tk="take"
 
 # change dir
 up() {
-	local cdir="$(pwd)"
-	if [[ "${1}" == "" ]]; then
-		cdir="$(dirname) "${cdir}")"
-	elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
-		echo "🛂  Arg must be a number"
-	elif ! [[ "${1}" -gt "0" ]]; then
-		echo "a POSITIVE number"
-	else
-		for i in {1..${1}}; do
-			local ncdir="$(dirname "${cdir}")"
-			if [[ "${cdir}" == "${ncdir}" ]]; then
-				break
-			else
-				cdir="${ncdir}"
-			fi
-		done
-	fi
-	cd "${cdir}"
+  echo "up: move up N directories (default 1). Usage: up [levels]"
+  local cdir="$(pwd)"
+  if [[ "${1}" == "" ]]; then
+    cdir="$(dirname) "${cdir}")"
+  elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
+    echo "🛂  Arg must be a number"
+  elif ! [[ "${1}" -gt "0" ]]; then
+    echo "a POSITIVE number"
+  else
+    for i in {1..${1}}; do
+      local ncdir="$(dirname "${cdir}")"
+      if [[ "${cdir}" == "${ncdir}" ]]; then
+        break
+      else
+        cdir="${ncdir}"
+      fi
+    done
+  fi
+  cd "${cdir}"
 }
 
 # animated gifs from any video
 # https://gist.github.com/SlexAxton/4989674
 gifify() {
-	if [[ -n "$1" ]]; then
-		if [[ $2 == '--good' ]]; then
-			ffmpeg -i "$1" -r 10 -vcodec png out-static-%05d.png
-			time convert -verbose +dither -layers Optimize -resize 900x900\> out-static*.png GIF:- | gifsicle --colors 128 --delay=5 --loop --optimize=3 --multifile - >"$1.gif"
-			rm out-static*.png
-		else
-			ffmpeg -i "$1" -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 >"$1.gif"
-		fi
-	else
-		echo "✋  proper usage: gifify <input_movie.mov>. You DO need to include extension."
-	fi
+  echo "gifify: convert a video file to GIF. Usage: gifify <input_movie.ext> [--good]"
+  if [[ -n "$1" ]]; then
+    if [[ $2 == '--good' ]]; then
+      ffmpeg -i "$1" -r 10 -vcodec png out-static-%05d.png
+      time convert -verbose +dither -layers Optimize -resize 900x900\> out-static*.png GIF:- | gifsicle --colors 128 --delay=5 --loop --optimize=3 --multifile - >"$1.gif"
+      rm out-static*.png
+    else
+      ffmpeg -i "$1" -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 >"$1.gif"
+    fi
+  else
+    echo "✋  proper usage: gifify <input_movie.mov>. You DO need to include extension."
+  fi
+}
+
+# encode a video, --no-audio to skip audio
+encode() {
+  echo "encode: compress a video to H.264 with optional audio removal. Usage: encode [--no-audio] <input_movie.ext>"
+  local audio_args="-acodec mp2"
+  local input=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --no-audio)
+      audio_args="-an"
+      shift
+      ;;
+    *)
+      input="$1"
+      shift
+      ;;
+    esac
+  done
+
+  if [[ -n "$input" ]]; then
+    ffmpeg -i "$input" -vcodec h264 $audio_args -crf 28 "$input-compressed.mp4"
+  else
+    echo "✋  proper usage: encode [--no-audio] <input_movie.mov>. You DO need to include extension."
+  fi
 }
 
 # defaulting tree
@@ -690,39 +858,24 @@ gifify() {
 
 # 🗑
 emptytrash() {
-	print_header "🗑  Emptying trashes..."
-	sudo rm -rfv /Volumes/*/.Trashes 1>/dev/null
-	rm -rfv ~/.Trash/* 1>/dev/null
-	sudo rm -v /private/var/vm/sleepimage 1>/dev/null
+  echo "emptytrash: clear system/user Trash and remove sleep image. Usage: emptytrash"
+  print_header "🗑  Emptying trashes..."
+  sudo rm -rfv /Volumes/*/.Trashes 1>/dev/null
+  rm -rfv ~/.Trash/* 1>/dev/null
+  sudo rm -v /private/var/vm/sleepimage 1>/dev/null
 
-}
-
-pyenv() {
-	local command
-	command="${1:-}"
-	if [ "$#" -gt 0 ]; then
-		shift
-	fi
-
-	case "$command" in
-	rehash | shell)
-		eval "$(pyenv "sh-$command" "$@")"
-		;;
-	*)
-		command pyenv "$command" "$@"
-		;;
-	esac
 }
 
 # Loads `.env` file same dir
 loadenv() {
-	while read line; do
-		if [ "${line:0:1}" = '#' ]; then
-			continue # comments are ignored
-		fi
-		export $line >/dev/null
-	done <"$1"
-	echo 'Loaded!'
+  echo "loadenv: export environment variables from a .env-style file. Usage: loadenv <env-file>"
+  while read line; do
+    if [ "${line:0:1}" = '#' ]; then
+      continue # comments are ignored
+    fi
+    export $line >/dev/null
+  done <"$1"
+  echo 'Loaded!'
 }
 
 alias activate='source .venv/bin/activate'
@@ -730,32 +883,24 @@ alias activate='source .venv/bin/activate'
 alias cfl='cf login -a api.fr.cloud.gov --sso'
 
 venv() {
-    local arg=${1:-}
-    local py
+  echo "venv: create and activate .venv using uv. Usage: venv [python-version|python-binary]"
+  local arg=${1:-}
 
-    # if it's just a version number, install/use via pyenv
-    if [[ $arg =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
-        # install under pyenv if missing
-        if ! pyenv versions --bare | grep -qx "$arg"; then
-            pyenv install "$arg"
-        fi
-        py="$(pyenv root)/versions/$arg/bin/python"
+  if [[ ! -d .venv ]]; then
+    if [[ -n "$arg" ]]; then
+      uv venv --python "$arg" .venv
     else
-        # otherwise treat as a python binary name
-        py=${arg:-python3}
+      uv venv .venv
     fi
-
-    # create & activate
-    if [[ ! -d .venv ]]; then
-        "$py" -m venv .venv
-    fi
-    source .venv/bin/activate
+  fi
+  source .venv/bin/activate
 }
 
 # Sets up all my working env
 workon() {
-	if _z 2>&1 "$1"; then
-		source '.venv/bin/activate' || true # There might be no `.venv`
-		code .
-	fi
+  echo "workon: jump to a tracked directory, activate .venv if present, and open VS Code. Usage: workon <z-location-query>"
+  if _z 2>&1 "$1"; then
+    source '.venv/bin/activate' || true # There might be no `.venv`
+    code .
+  fi
 }

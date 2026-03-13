@@ -105,6 +105,11 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.usePythonEnvironmentsExtension": true,
+  "python-envs.alwaysUseUv": true,
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.terminal.autoActivationType": "shellStartup",
   "[python]": {
     "files.trimTrailingWhitespace": true,
     "editor.defaultFormatter": "ms-python.black-formatter"
@@ -346,10 +351,9 @@
   },
   "cmake.showOptionsMovedNotification": false,
   "rubyLsp.rubyVersionManager": {
-    "identifier": "rbenv"
+    "identifier": "mise"
   },
   "editor.defaultFormatter": "ms-python.black-formatter",
-  "rubyLsp.customRubyCommand": "rbenv local 3.1.4",
   "github.copilot.chat.localeOverride": "en",
   "github.copilot.chat.fixTestFailures": true,
   "github.copilot.editor.enableAutoCompletions": true,

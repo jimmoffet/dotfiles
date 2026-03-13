@@ -98,7 +98,7 @@ def get_combined_diff(default_branch):
 def detect_template_type_from_branch(branch_name):
     """Auto-detect template type from branch name"""
     branch_lower = branch_name.lower()
-    
+
     # Common branch naming patterns
     patterns = {
         "feat/": "feature",
@@ -110,11 +110,11 @@ def detect_template_type_from_branch(branch_name):
         "chore/": "chore",
         "infra/": "infra",
     }
-    
+
     for pattern, template_type in patterns.items():
         if branch_lower.startswith(pattern):
             return template_type
-    
+
     return None
 
 
@@ -122,7 +122,7 @@ def detect_template_type_from_commits(commits):
     """Auto-detect template type from commit prefixes"""
     if not commits:
         return None
-    
+
     # Count conventional commit prefixes
     prefix_counts = {
         "feat": 0,
@@ -132,13 +132,13 @@ def detect_template_type_from_commits(commits):
         "refac": 0,
         "hotfix": 0,
     }
-    
+
     for line in commits.split("\n"):
         line = line.strip().lower()
         for prefix in prefix_counts:
             if line.startswith(f"{prefix}:"):
                 prefix_counts[prefix] += 1
-    
+
     # Return most common prefix type
     max_prefix = max(prefix_counts, key=prefix_counts.get)
     if prefix_counts[max_prefix] > 0:
@@ -149,51 +149,182 @@ def detect_template_type_from_commits(commits):
         elif max_prefix == "refac":
             return "feature"  # Refactors often use feature template
         return max_prefix
-    
+
     return None
 
 
-def find_pr_template(template_type=None, current_branch=None, commits=None):
-    """Find PR template following search order"""
-    # Auto-detect template type if not specified
-    if not template_type:
-        template_type = detect_template_type_from_branch(current_branch) if current_branch else None
-    
-    if not template_type:
-        template_type = detect_template_type_from_commits(commits)
-    
-    # Default to feature if still no type
-    if not template_type:
-        template_type = "feature"
-    
-    # Search order
-    search_paths = []
-    
-    # 1. Project-specific templates with type
+def discover_templates_directory():
+    """Discover the templates directory: project .github/ or dotfiles/scripts"""
+    # Try project-specific templates first
+    project_template_dir = Path(".github/PULL_REQUEST_TEMPLATE")
+    if project_template_dir.exists() and project_template_dir.is_dir():
+        # Check if there are any markdown files
+        md_files = list(project_template_dir.glob("*.md"))
+        if md_files:
+            return project_template_dir
+
+    # Fallback to dotfiles templates
+    dotfiles_template_dir = (
+        Path.home() / "dotfiles" / "scripts" / "PULL_REQUEST_TEMPLATE"
+    )
+    return dotfiles_template_dir
+
+
+def choose_template_with_ai(templates_dir, commits, user_guidance=None):
+    """Use GPT to choose the best template from available options"""
+    try:
+        from openai import OpenAI
+    except ImportError:
+        return None
+
+    api_key = get_openai_api_key()
+    if not api_key:
+        return None
+
+    # Get all markdown templates
+    template_files = sorted(templates_dir.glob("*.md"))
+    if not template_files:
+        return None
+
+    # If only one template, return it
+    if len(template_files) == 1:
+        try:
+            return template_files[0].read_text(), str(template_files[0])
+        except Exception:
+            return None
+
+    # Build prompt with template list and contents
+    template_names = [f"- {f.stem}" for f in template_files]
+    template_contents = []
+
+    for template_file in template_files:
+        try:
+            content = template_file.read_text()
+            template_contents.append(
+                f"========== {template_file.stem.upper()} ==========\n{content}\n"
+            )
+        except Exception:
+            continue
+
+    if not template_contents:
+        return None
+
+    prompt_parts = [
+        "Choose the most appropriate pull request template for these commits.",
+        "",
+        "**Available templates:**",
+        "\n".join(template_names),
+        "",
+        "**Commit messages:**",
+        commits,
+    ]
+
+    if user_guidance:
+        prompt_parts.insert(1, f"**User guidance:** {user_guidance}")
+        prompt_parts.insert(2, "")
+
+    prompt_parts.extend(
+        [
+            "",
+            "**Template contents:**",
+            "".join(template_contents),
+        ]
+    )
+
+    prompt = "\n".join(prompt_parts)
+
+    client = OpenAI(api_key=api_key)
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a template selector. Analyze the commits and user guidance to choose the most appropriate PR template. Output ONLY the full markdown text of the chosen template, nothing else. Do not include any explanatory text, acknowledgments, or phrases like 'Okay' or 'I understand'. Output only the raw template markdown.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            max_completion_tokens=2000,
+            temperature=0.1,
+        )
+
+        chosen_template = response.choices[0].message.content.strip()
+
+        # Try to determine which template was chosen by matching content
+        for template_file in template_files:
+            try:
+                original_content = template_file.read_text().strip()
+                # If the AI output closely matches a template, attribute it
+                if (
+                    original_content in chosen_template
+                    or chosen_template in original_content
+                ):
+                    return chosen_template, f"{template_file.stem} (AI-selected)"
+            except Exception:
+                continue
+
+        return chosen_template, "AI-selected"
+
+    except Exception as e:
+        print(f"Template selection error: {e}", file=sys.stderr)
+        return None
+
+
+def find_pr_template(
+    template_type=None, current_branch=None, commits=None, user_guidance=None
+):
+    """Find or AI-select PR template"""
+    # Discover templates directory
+    templates_dir = discover_templates_directory()
+
+    # If specific template type requested, try to find it directly
     if template_type:
-        search_paths.append(Path(f".github/PULL_REQUEST_TEMPLATE/{template_type}.md"))
-    
-    # 2. Project-specific single template
-    search_paths.append(Path(".github/pull_request_template.md"))
-    
-    # 3. Dotfiles templates with type
-    dotfiles_template_dir = Path.home() / "dotfiles" / "scripts" / "PULL_REQUEST_TEMPLATE"
-    if template_type:
-        search_paths.append(dotfiles_template_dir / f"{template_type}.md")
-    
-    # 4. Dotfiles default template
-    search_paths.append(dotfiles_template_dir / "feature.md")
-    
-    # Find first existing template
-    for template_path in search_paths:
+        template_path = templates_dir / f"{template_type}.md"
         if template_path.exists():
             try:
                 return template_path.read_text(), str(template_path)
             except Exception:
-                continue
-    
-    # Fallback: basic template
-    return """## Description
+                pass
+
+    # Otherwise, use AI to choose from available templates
+    if commits:
+        result = choose_template_with_ai(templates_dir, commits, user_guidance)
+        if result:
+            return result
+
+    # Fallback: try auto-detection
+    if not template_type:
+        template_type = (
+            detect_template_type_from_branch(current_branch) if current_branch else None
+        )
+
+    if not template_type and commits:
+        template_type = detect_template_type_from_commits(commits)
+
+    # Default to feature if still no type
+    if not template_type:
+        template_type = "feature"
+
+    # Try to find the detected type
+    template_path = templates_dir / f"{template_type}.md"
+    if template_path.exists():
+        try:
+            return template_path.read_text(), str(template_path)
+        except Exception:
+            pass
+
+    # Last resort: use first available template
+    template_files = list(templates_dir.glob("*.md"))
+    if template_files:
+        try:
+            return template_files[0].read_text(), str(template_files[0])
+        except Exception:
+            pass
+
+    # Ultimate fallback: basic template
+    return (
+        """## Description
 [Describe the changes]
 
 ## Changes
@@ -201,7 +332,9 @@ def find_pr_template(template_type=None, current_branch=None, commits=None):
 
 ## Testing
 [How to test]
-""", "built-in"
+""",
+        "built-in",
+    )
 
 
 def get_openai_api_key():
@@ -232,7 +365,9 @@ def get_openai_api_key():
     return os.getenv("OPENAI_API_KEY")
 
 
-def generate_pr_content(commits, git_diff, template_content, user_guidance=None):
+def generate_pr_content(
+    commits, git_diff, template_content, user_guidance=None, dry_run=False
+):
     """Generate PR title and body using OpenAI"""
     try:
         from openai import OpenAI
@@ -276,6 +411,33 @@ def generate_pr_content(commits, git_diff, template_content, user_guidance=None)
 
     prompt = "\n".join(prompt_parts)
 
+    # Dry run: output request and exit early
+    if dry_run:
+        print("\n" + "=" * 80)
+        print("DRY RUN - REQUEST TO OPENAI API")
+        print("=" * 80)
+        print(f"\nModel: gpt-4.1-mini")
+        print(f"Max tokens: 1500")
+        print(f"Temperature: 0.3")
+        print(f"\nSystem message:")
+        print("-" * 80)
+        print(
+            "You are a helpful assistant that analyzes code changes and writes clear, comprehensive pull request descriptions. Follow the provided template structure. Use conventional commit prefixes (feat:, fix:, docs:, refactor:, chore:, etc.) in titles."
+        )
+        print("-" * 80)
+        print(f"\nUser prompt ({len(prompt)} chars, ~{len(prompt) // 4} tokens):")
+        print("-" * 80)
+        for part in prompt_parts:
+            print(part[:10000])  # Limit output size
+            print("-" * 80)
+        print("\n[Dry run mode - skipping actual API call]")
+        print("=" * 80 + "\n")
+        # Return dummy data for dry run
+        return (
+            "feat: dry run PR title",
+            "This is a dry run - no actual API call was made.",
+        )
+
     try:
         response = client.chat.completions.parse(
             model="gpt-4.1-mini",
@@ -316,6 +478,29 @@ def generate_pr_content(commits, git_diff, template_content, user_guidance=None)
 
         # Parse the structured response
         pr_content = response.choices[0].message.parsed
+
+        # Dry run: output response
+        if dry_run:
+            print("\n" + "=" * 80)
+            print("DRY RUN - RESPONSE FROM OPENAI API")
+            print("=" * 80)
+            print(f"\nTitle: {pr_content.title}")
+            print("\nBody:")
+            print("-" * 80)
+            print(pr_content.body)
+            print("-" * 80)
+            if os.getenv("AI_PR_USAGE") or dry_run:
+                usage = getattr(response, "usage", None)
+                if usage:
+                    prompt_tokens = getattr(usage, "prompt_tokens", "?")
+                    completion_tokens = getattr(usage, "completion_tokens", "?")
+                    total_tokens = getattr(usage, "total_tokens", "?")
+                    print(f"\nToken usage:")
+                    print(f"  Prompt tokens: {prompt_tokens}")
+                    print(f"  Completion tokens: {completion_tokens}")
+                    print(f"  Total tokens: {total_tokens}")
+            print("=" * 80 + "\n")
+
         return pr_content.title, pr_content.body
 
     except Exception as e:
@@ -351,13 +536,19 @@ def create_pull_request(title, body, base_branch, current_branch, draft=False):
 
     # Create PR
     cmd = [
-        "gh", "pr", "create",
-        "--base", base_branch,
-        "--head", current_branch,
-        "--title", title,
-        "--body", body,
+        "gh",
+        "pr",
+        "create",
+        "--base",
+        base_branch,
+        "--head",
+        current_branch,
+        "--title",
+        title,
+        "--body",
+        body,
     ]
-    
+
     if draft:
         cmd.append("--draft")
 
@@ -380,12 +571,29 @@ def create_pull_request(title, body, base_branch, current_branch, draft=False):
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Generate and create AI-powered pull requests")
-    parser.add_argument("guidance", nargs="?", help="Optional guidance for AI to customize PR title/body")
-    parser.add_argument("--template", help="Specify template type (feature, bugfix, hotfix, etc.)")
+    parser = argparse.ArgumentParser(
+        description="Generate and create AI-powered pull requests"
+    )
+    parser.add_argument(
+        "guidance",
+        nargs="?",
+        help="Optional guidance for AI to customize PR title/body",
+    )
+    parser.add_argument(
+        "--template", help="Specify template type (feature, bugfix, hotfix, etc.)"
+    )
     parser.add_argument("--draft", action="store_true", help="Create as draft PR")
-    parser.add_argument("--no-ai", action="store_true", help="Skip AI generation, use commits as-is")
-    parser.add_argument("--base", help="Target branch (defaults to repo default branch)")
+    parser.add_argument(
+        "--no-ai", action="store_true", help="Skip AI generation, use commits as-is"
+    )
+    parser.add_argument(
+        "--base", help="Target branch (defaults to repo default branch)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show request/response without creating PR",
+    )
 
     args = parser.parse_args()
 
@@ -414,7 +622,10 @@ def main():
 
     # Check if current branch is default branch
     if current_branch == default_branch:
-        print(f"Error: Cannot create PR from default branch ({default_branch})", file=sys.stderr)
+        print(
+            f"Error: Cannot create PR from default branch ({default_branch})",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # Get commits ahead of default
@@ -431,7 +642,7 @@ def main():
 
     # Find PR template
     template_content, template_source = find_pr_template(
-        args.template, current_branch, commits
+        args.template, current_branch, commits, args.guidance
     )
     print(f"Using template: {template_source}", file=sys.stderr)
 
@@ -443,16 +654,25 @@ def main():
     else:
         # AI mode
         print("Generating PR content with AI...", file=sys.stderr)
-        result = generate_pr_content(commits, git_diff, template_content, args.guidance)
+        result = generate_pr_content(
+            commits, git_diff, template_content, args.guidance, args.dry_run
+        )
         if not result:
             print("Error: Failed to generate PR content", file=sys.stderr)
             sys.exit(1)
         title, body = result
 
+    # Skip PR creation in dry-run mode
+    if args.dry_run:
+        print("Dry run complete - PR not created", file=sys.stderr)
+        sys.exit(0)
+
     # Create PR
     print(f"Creating PR: {title}", file=sys.stderr)
-    pr_url = create_pull_request(title, body, default_branch, current_branch, args.draft)
-    
+    pr_url = create_pull_request(
+        title, body, default_branch, current_branch, args.draft
+    )
+
     if pr_url:
         print(pr_url)  # Output PR URL to stdout for shell capture
         sys.exit(0)

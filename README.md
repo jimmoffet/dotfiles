@@ -55,8 +55,9 @@ This will fetch [run.sh](https://raw.githubusercontent.com/jimmoffet/dotfiles/ma
 
 The install script will also setup Python and Node versions/environments:
 
-- [pyenv](https://github.com/pyenv/pyenv) sets the global Python version to 3.10
-- [n](https://github.com/tj/n) sets the global Node version to LTS
+- [uv](https://github.com/astral-sh/uv) manages Python installs and project virtual environments
+- [nvm](https://github.com/nvm-sh/nvm) sets the active Node version and supports per-project `.nvmrc` files
+- [mise](https://mise.jdx.dev/) manages Ruby installs and supports per-project `.ruby-version` files
 
 ### Customization
 

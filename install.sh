@@ -141,37 +141,37 @@ install_docker() {
 configure_ruby() {
     printf "\n🌈  Configure Ruby\n"
 
-    # check if "gem: --no-document" in ~/.gemrc
-    if ! grep -q 'gem: --no-document' ~/.gemrc; then
-        printf "Adding gem: --no-document to ~/.gemrc...\n"
-        echo "gem: --no-document" >> ~/.gemrc
-    else
-        printf "gem: --no-document already in ~/.gemrc.\n"
+    if ! command -v mise >/dev/null 2>&1; then
+        printf "mise is not installed. Install Homebrew packages first.\n"
+        exit 1
     fi
 
-    # check if rvm is available
-    if command -v rvm &> /dev/null; then
-        printf "RVM found, skipping installation.\n"
-    else
-        printf "RVM not found, installing...\n"
-        # RVM maintainer public keys
-        # 409B6B1796C275462A1703113804BB82D39DC0E3 # mpapis
-        # 7D2BAF1CF37B13E2069D6956105BD0E739499BDB # pkuczynski
-        gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-        # install rvm
-        \curl -sSL https://get.rvm.io | bash
+    mkdir -p "$HOME/.config/mise"
+
+    if [ -f "$HOME/dotfiles/mise/.config/mise/config.toml" ]; then
+        cp "$HOME/dotfiles/mise/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
     fi
 
-    rvm install ruby --default
-    rvm use default
-    rvm reload
+    if [ -f "$HOME/dotfiles/mise/.default-gems" ]; then
+        cp "$HOME/dotfiles/mise/.default-gems" "$HOME/.default-gems"
+    fi
 
-    # install gems
-    gem update --system
-    gem install bundler
+    printf "Installing configured Ruby with mise...\n"
+    env -u GEM_HOME -u GEM_PATH -u MY_RUBY_HOME -u RUBY_VERSION mise use -g ruby@3.4.1
+
     num_cores=$(sysctl -n hw.ncpu)
-    bundle config set --global jobs $((num_cores - 1))
-    gem install clocale colorls rails
+    env -u GEM_HOME -u GEM_PATH -u MY_RUBY_HOME -u RUBY_VERSION mise exec ruby@3.4.1 -- bundle config set --global jobs $((num_cores - 1))
+    if [ -f "$HOME/.default-gems" ]; then
+        printf "Installing configured Ruby gems...\n"
+        while IFS= read -r gem_name; do
+            case "$gem_name" in
+                ""|\#*)
+                    continue
+                    ;;
+            esac
+            env -u GEM_HOME -u GEM_PATH -u MY_RUBY_HOME -u RUBY_VERSION mise exec ruby@3.4.1 -- gem install "$gem_name"
+        done < "$HOME/.default-gems"
+    fi
     sudo -v
 }
 
@@ -214,20 +214,13 @@ EOF
 
 configure_python() {
     printf "\n🐍  Configure Python\n"
-    # Get the latest stable Python version
-    latest_python=$(pyenv install --list | grep -E "^\s*[0-9]+\.[0-9]+\.[0-9]+$" | tail -1 | tr -d ' ')
-    
-    if [ -z "$latest_python" ]; then
-        printf "Failed to determine the latest Python version.\n"
+    if ! command -v uv >/dev/null 2>&1; then
+        printf "uv is not installed. Install Homebrew packages first.\n"
         exit 1
     fi
 
-    printf "Installing Python $latest_python...\n"
-    pyenv install "$latest_python" -f 1>/dev/null
-    pyenv global "$latest_python" 1>/dev/null
-
-    # Optional: Prevent conda clutter in zshrc
-    # conda config --set auto_activate_base false
+    printf "Installing the latest managed Python with uv...\n"
+    uv python install
 
     sudo -v
 }
@@ -252,7 +245,7 @@ stow_dotfiles() {
     # Remove existing global git hooks if they exist
     rm -f ~/.global-git-hooks/pre-commit
     # stow colorls fzf git nvim yabai skhd starship tmux vim z zsh
-    stow colorls fzf git nvim starship tmux vim z zsh .global-git-hooks scripts
+    stow colorls fzf git mise nvim starship tmux vim z zsh .global-git-hooks scripts
     sudo -v
 }
 
